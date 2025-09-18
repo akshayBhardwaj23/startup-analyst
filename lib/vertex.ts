@@ -17,19 +17,3 @@ export const vertex = new VertexAI({
 });
 
 export const gemini = vertex.getGenerativeModel({ model: "gemini-2.5-pro" });
-
-export async function embedTextBatch(texts: string[]) {
-  const embedModel: any = vertex.getGenerativeModel({
-    model: "text-embedding-004",
-  });
-  const results = await Promise.all(
-    texts.map(async (t) => {
-      const res: any = await embedModel.embedContent({
-        content: { parts: [{ text: t }] },
-      });
-      const embedding = (res.embeddings?.[0] || res.embedding)?.values || [];
-      return embedding as number[];
-    })
-  );
-  return results;
-}

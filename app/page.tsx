@@ -6,8 +6,6 @@ type Brief = Record<string, any>;
 export default function Home() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [companyName, setCompanyName] = useState("");
-  const [docId, setDocId] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [brief, setBrief] = useState<Brief | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -51,54 +49,20 @@ export default function Home() {
     return lines.join("\n").trim();
   };
 
-  const onUpload = async () => {
-    try {
-      setError(null);
-      setBrief(null);
-      if (!files || files.length === 0) {
-        setError("Please select at least one PDF or DOCX file");
-        return;
-      }
-      const form = new FormData();
-      for (let i = 0; i < files.length; i++) form.append("files", files[i]);
-      setUploading(true);
-      const res = await fetch("/api/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      setDocId(data.docId);
-    } catch (e: any) {
-      setError(e.message || "Upload failed");
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const onAnalyze = async () => {
     try {
       setError(null);
       setAnalyzing(true);
-      let data: any;
-      if (docId) {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ companyName, docId }),
-        });
-        data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Analyze failed");
-      } else if (files && files.length > 0) {
-        const form = new FormData();
-        for (let i = 0; i < files.length; i++) form.append("files", files[i]);
-        form.append("companyName", companyName);
-        const res = await fetch("/api/analyze-direct", {
-          method: "POST",
-          body: form,
-        });
-        data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Analyze failed");
-      } else {
-        throw new Error("Upload files first");
-      }
+      if (!files || files.length === 0) throw new Error("Upload files first");
+      const form = new FormData();
+      for (let i = 0; i < files.length; i++) form.append("files", files[i]);
+      form.append("companyName", companyName);
+      const res = await fetch("/api/analyze-direct", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Analyze failed");
       setBrief(data.brief);
     } catch (e: any) {
       setError(e.message || "Analyze failed");
@@ -126,16 +90,6 @@ export default function Home() {
               className="block w-full"
             />
           </div>
-          <button
-            onClick={onUpload}
-            disabled={uploading || !files || files.length === 0}
-            className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
-          >
-            {uploading ? "Uploading…" : "Upload & Index"}
-          </button>
-          {docId && (
-            <div className="text-xs text-gray-600">Indexed docId: {docId}</div>
-          )}
         </div>
 
         <div className="space-y-3 rounded-lg border p-4">
@@ -149,7 +103,7 @@ export default function Home() {
           />
           <button
             onClick={onAnalyze}
-            disabled={analyzing || (!docId && (!files || files.length === 0))}
+            disabled={analyzing || !files || files.length === 0}
             className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
           >
             {analyzing ? "Analyzing…" : "Generate VC Brief"}
