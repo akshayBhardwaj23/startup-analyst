@@ -8,16 +8,19 @@ export const metadata: Metadata = {
 };
 
 const members = [
-    {
+  {
     name: "Ashwin Sheoran",
+    role: "Product & Growth",
     url: "https://www.linkedin.com/in/ashwin-sheoran/",
   },
   {
     name: "Akshay Bhardwaj",
+    role: "Engineering",
     url: "https://www.linkedin.com/in/akshaybhardwaj-23/",
   },
   {
     name: "Shreyanshu Sharma",
+    role: "AI Research",
     url: "https://www.linkedin.com/in/shreyanshu-sharma/",
   },
 ];
