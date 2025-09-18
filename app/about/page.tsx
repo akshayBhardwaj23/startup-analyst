@@ -27,9 +27,9 @@ export default function AboutTeam() {
     <div className="max-w-5xl mx-auto px-5 md:px-8 py-10 md:py-14 font-sans fade-in">
       <div className="mb-10">
         <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">The Team</h1>
-        <p className="mt-3 text-sm max-w-2xl opacity-70 leading-relaxed">
-          We're building faster founder & market diligence. Combining product intuition, deep learning systems and analytical rigor to compress hours of manual parsing into seconds.
-        </p>
+            <p className="mt-3 text-sm max-w-2xl opacity-70 leading-relaxed">
+              We&apos;re building faster founder & market diligence. Combining product intuition, deep learning systems and analytical rigor to compress hours of manual parsing into seconds.
+            </p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
