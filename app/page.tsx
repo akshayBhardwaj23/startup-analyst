@@ -1,103 +1,180 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+
+type Brief = Record<string, any>;
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [files, setFiles] = useState<FileList | null>(null);
+  const [companyName, setCompanyName] = useState("");
+  const [docId, setDocId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [brief, setBrief] = useState<Brief | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const formatBriefToText = (b: any) => {
+    if (!b) return "";
+    const lines: string[] = [];
+    const add = (label: string, value: any) => {
+      if (value == null) return;
+      if (Array.isArray(value)) {
+        if (value.length === 0) return;
+        lines.push(`${label}:`);
+        for (const item of value) {
+          const text =
+            typeof item === "object" ? JSON.stringify(item) : String(item);
+          lines.push(`- ${text}`);
+        }
+      } else if (typeof value === "object") {
+        lines.push(`${label}:`);
+        lines.push(JSON.stringify(value, null, 2));
+      } else {
+        lines.push(`${label}: ${String(value)}`);
+      }
+      lines.push("");
+    };
+
+    add("One-liner", b.one_liner);
+    add("Problem", b.problem);
+    add("Solution", b.solution);
+    add("ICP & GTM", b.icp_gtm);
+    add("Traction", b.traction_bullets);
+    add("Business model", b.business_model);
+    add("TAM", b.tam);
+    add("Team", b.team);
+    add("Moat", b.moat_bullets);
+    add("Risks", b.risks_bullets);
+    add("Why now", b.why_now);
+    add("Hypotheses", b.hypotheses);
+    add("Founder questions", b.founder_questions);
+
+    return lines.join("\n").trim();
+  };
+
+  const onUpload = async () => {
+    try {
+      setError(null);
+      setBrief(null);
+      if (!files || files.length === 0) {
+        setError("Please select at least one PDF or DOCX file");
+        return;
+      }
+      const form = new FormData();
+      for (let i = 0; i < files.length; i++) form.append("files", files[i]);
+      setUploading(true);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      setDocId(data.docId);
+    } catch (e: any) {
+      setError(e.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const onAnalyze = async () => {
+    try {
+      setError(null);
+      setAnalyzing(true);
+      let data: any;
+      if (docId) {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ companyName, docId }),
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Analyze failed");
+      } else if (files && files.length > 0) {
+        const form = new FormData();
+        for (let i = 0; i < files.length; i++) form.append("files", files[i]);
+        form.append("companyName", companyName);
+        const res = await fetch("/api/analyze-direct", {
+          method: "POST",
+          body: form,
+        });
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Analyze failed");
+      } else {
+        throw new Error("Upload files first");
+      }
+      setBrief(data.brief);
+    } catch (e: any) {
+      setError(e.message || "Analyze failed");
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen p-6 sm:p-10 font-sans">
+      <div className="max-w-3xl mx-auto space-y-6">
+        <h1 className="text-2xl font-semibold">
+          VC Analyst – Upload & Analyze
+        </h1>
+        <div className="space-y-4 rounded-lg border p-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Upload files (PDF/DOCX)
+            </label>
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+              onChange={(e) => setFiles(e.target.files)}
+              className="block w-full"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </div>
+          <button
+            onClick={onUpload}
+            disabled={uploading || !files || files.length === 0}
+            className="px-4 py-2 rounded bg-black text-white disabled:opacity-50"
           >
-            Read our docs
-          </a>
+            {uploading ? "Uploading…" : "Upload & Index"}
+          </button>
+          {docId && (
+            <div className="text-xs text-gray-600">Indexed docId: {docId}</div>
+          )}
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        <div className="space-y-3 rounded-lg border p-4">
+          <label className="block text-sm font-medium">Company name</label>
+          <input
+            type="text"
+            value={companyName}
+            onChange={(e) => setCompanyName(e.target.value)}
+            placeholder="e.g., Acme Corp"
+            className="w-full border rounded px-3 py-2"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <button
+            onClick={onAnalyze}
+            disabled={analyzing || (!docId && (!files || files.length === 0))}
+            className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-50"
+          >
+            {analyzing ? "Analyzing…" : "Generate VC Brief"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="rounded border border-red-300 bg-red-50 text-red-800 p-3 text-sm">
+            {error}
+          </div>
+        )}
+
+        {brief && (
+          <div className="rounded-lg border p-4 space-y-3">
+            <h2 className="text-lg font-semibold">Brief</h2>
+            {brief.raw ? (
+              <pre className="whitespace-pre-wrap text-sm">{brief.raw}</pre>
+            ) : (
+              <pre className="whitespace-pre-wrap text-sm">
+                {formatBriefToText(brief)}
+              </pre>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
