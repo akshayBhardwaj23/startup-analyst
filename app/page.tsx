@@ -257,7 +257,7 @@ export default function Home() {
         </section>
 
         <footer className="mt-8 text-center text-xs text-zinc-500">
-          Built with Next.js • Vertex AI
+          Built by ©Token Tribe
         </footer>
       </div>
 
