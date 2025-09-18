@@ -76,7 +76,7 @@ Documents:\n${chunks}`;
 
   const text =
     result?.response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
-  let brief: any;
+  const brief: any = undefined as any;
   const extractJson = (s: string): any | null => {
     const fenced =
       s.match(/```json\s*([\s\S]*?)```/i) || s.match(/```\s*([\s\S]*?)```/i);
@@ -95,7 +95,7 @@ Documents:\n${chunks}`;
       return null;
     }
   };
-  brief = extractJson(text) ?? { raw: text };
+  const parsed = extractJson(text) ?? { raw: text };
 
-  return NextResponse.json({ brief });
+  return NextResponse.json({ brief: parsed });
 }
