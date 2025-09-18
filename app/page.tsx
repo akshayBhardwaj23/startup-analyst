@@ -61,8 +61,16 @@ export default function Home() {
         method: "POST",
         body: form,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Analyze failed");
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok) {
+        const errText = contentType.includes("application/json")
+          ? JSON.stringify(await res.json())
+          : await res.text();
+        throw new Error(errText || `${res.status} ${res.statusText}`);
+      }
+      const data = contentType.includes("application/json")
+        ? await res.json()
+        : { brief: { raw: await res.text() } };
       setBrief(data.brief);
     } catch (e: any) {
       setError(e.message || "Analyze failed");
@@ -87,6 +95,7 @@ export default function Home() {
               multiple
               accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               onChange={(e) => setFiles(e.target.files)}
+              disabled={analyzing}
               className="block w-full"
             />
           </div>
@@ -129,6 +138,16 @@ export default function Home() {
           </div>
         )}
       </div>
+      {analyzing && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-3 text-white">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            <div className="text-sm">
+              Analyzing files… this can take up to a minute
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
