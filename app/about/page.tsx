@@ -10,17 +10,14 @@ export const metadata: Metadata = {
 const members = [
   {
     name: "Ashwin Sheoran",
-    role: "Product & Growth",
     url: "https://www.linkedin.com/in/ashwin-sheoran/",
   },
   {
     name: "Akshay Bhardwaj",
-    role: "Engineering",
     url: "https://www.linkedin.com/in/akshaybhardwaj-23/",
   },
   {
     name: "Shreyanshu Sharma",
-    role: "AI Research",
     url: "https://www.linkedin.com/in/shreyanshu-sharma/",
   },
 ];
@@ -50,7 +47,6 @@ export default function AboutTeam() {
               </div>
               <div>
                 <div className="font-medium tracking-tight">{m.name}</div>
-                <div className="text-xs opacity-70 mt-0.5">{m.role}</div>
               </div>
               <div className="mt-1 text-[11px] inline-flex items-center gap-1 text-indigo-400/80 group-hover:text-indigo-300">
                 <span>LinkedIn</span>
