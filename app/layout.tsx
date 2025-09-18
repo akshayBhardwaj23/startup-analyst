@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og.png",
+        url: "/brand-icon.png",
         width: 1200,
         height: 630,
         alt: "Startup-Analyst-XI",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Startup-Analyst-XI",
     description: "AI-assisted startup brief generator.",
-    images: ["/og.png"],
+    images: ["/brand-icon.png"],
   },
   icons: {
     icon: [
