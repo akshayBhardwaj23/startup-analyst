@@ -5,9 +5,24 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 async function parsePdf(buffer: Buffer): Promise<string> {
-  const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default as any;
-  const res = await pdfParse(buffer);
-  return String(res.text || "");
+  // Strategy: try normal parse -> then try passing object with data buffer
+  let firstErr: any = null;
+  try {
+    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default as any;
+    const res = await pdfParse(buffer);
+    if (res?.text) return String(res.text);
+  } catch (e: any) {
+    firstErr = e;
+  }
+  try {
+    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default as any;
+    const res = await pdfParse({ data: buffer });
+    if (res?.text) return String(res.text);
+  } catch (e) {
+    if (!firstErr) firstErr = e;
+  }
+  console.warn("pdf parse failed (all strategies)", firstErr?.message || firstErr);
+  return "";
 }
 
 async function parseDocx(buffer: Buffer): Promise<string> {
