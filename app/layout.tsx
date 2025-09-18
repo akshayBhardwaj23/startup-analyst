@@ -16,6 +16,25 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Startup-Analyst-XI",
   description: "Startup-Analyst-XI – AI-assisted startup brief generator.",
+  openGraph: {
+    title: "Startup-Analyst-XI",
+    description: "AI-assisted startup brief generator.",
+    type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Startup-Analyst-XI",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Startup-Analyst-XI",
+    description: "AI-assisted startup brief generator.",
+    images: ["/og.png"],
+  },
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
@@ -33,7 +52,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <NavBar />
         <main className="pt-6 md:pt-8">{children}</main>
       </body>
