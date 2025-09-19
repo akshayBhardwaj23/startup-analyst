@@ -79,8 +79,42 @@ export async function POST(req: NextRequest) {
     .map((t, idx) => `From ${names[idx]}:\n\n${t}`)
     .join("\n\n---\n\n");
 
-  const prompt = `You are a VC analyst. Create a JSON brief with fields: one_liner, problem, solution, icp_gtm, traction_bullets[], business_model, tam, team, moat_bullets[], risks_bullets[], why_now, founder_questions[]. Use ONLY the provided documents. If a claim has no evidence, mark it as NO-EVIDENCE and move it to 'hypotheses'. For each sentence include refs[] indicating the source doc name.
-Company: ${companyName}
+  const prompt = `You are a VC analyst. Produce ONLY valid JSON (no markdown fences, no commentary) matching EXACTLY this schema used by the UI:
+{
+  "one_liner": {"text":"...","refs":["file.pdf"]},
+  "problem": {"text":"...","refs":[...]},
+  "solution": {"text":"...","refs":[...]},
+  "icp_gtm": {
+    "icp": {"text":"...","refs":[...]},
+    "gtm": {"text":"...","refs":[...]}
+  },
+  "traction_bullets": [ {"text":"...","refs":[...]}, ... ],
+  "business_model": {"text":"...","refs":[...]},
+  "tam": {
+    "global_market": {"text":"...","refs":[...]},
+    "target_segment": {"text":"...","refs":[...]},
+    "growth": {"text":"...","refs":[...]}
+  },
+  "team": {"text":"...","refs":[...]},
+  "moat_bullets": [ {"text":"...","refs":[...]}, ... ],
+  "risks_bullets": [ {"text":"...","refs":[...]}, ... ],
+  "why_now": {"text":"...","refs":[...]},
+  "hypotheses": [ {"claim":"...","status":"NO-EVIDENCE|SUPPORTED","refs":[...]}, ... ],
+  "founder_questions": [ {"question":"...","rationale":"..."}, ... ]
+}
+
+Rules:
+- Use ONLY information in the provided documents.
+- If a factual/metric/market size/traction/claim lacks direct evidence in the docs, DO NOT include it in normal sections; instead add an entry to hypotheses with status "NO-EVIDENCE: <brief reason>". Supported claims may use status "SUPPORTED" (optional) or omit status for normal bullets.
+- Each narrative object MUST have a "text" string and a "refs" array listing source doc names that support that statement. If multiple sentences share refs you can repeat refs.
+- Team: If absolutely no team/founder info exists in the documents, set team.text to "UNSPECIFIED: No team information in provided documents." (leave refs as []). Do NOT fabricate or guess.
+- Bullet arrays (traction_bullets, moat_bullets, risks_bullets) = objects with text + refs.
+- Keep language concise, analyst tone.
+- Do NOT invent numbers; if TAM components not present, still include keys with empty text "" and empty refs [].
+- Always include every top-level key even if text is empty.
+- Output must be pure JSON with no leading or trailing characters.
+
+Company: ${companyName || 'Unknown'}
 
 Documents:\n${chunks}`;
 
