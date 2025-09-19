@@ -173,7 +173,7 @@ export default function Home() {
                     <span className="font-medium">
                       {dragActive ? "Release to add" : "Drag & drop or click to select"}
                     </span>
-                    <span className="text-xs opacity-70">PDF or DOCX • up to ~10MB each</span>
+                    <span className="text-xs opacity-70">PDF or DOCX • up to ~25MB each</span>
                     {totalFiles > 0 && (
                       <span className="mt-1 outline-pill">{totalFiles} file{totalFiles > 1 ? "s" : ""} selected</span>
                     )}
