@@ -11,9 +11,10 @@ if (
   process.env.GOOGLE_APPLICATION_CREDENTIALS = p;
 }
 
+// Default region changed to asia-south1 (Mumbai). Override by setting GCP_LOCATION.
 export const vertex = new VertexAI({
   project: process.env.GCP_PROJECT_ID!,
-  location: process.env.GCP_LOCATION || "us-central1",
+  location: process.env.GCP_LOCATION || "asia-south1",
 });
 
 export const gemini = vertex.getGenerativeModel({ model: "gemini-2.5-pro" });
