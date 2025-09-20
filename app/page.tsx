@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback, useRef } from "react";
+import { upload } from "@vercel/blob/client";
 
 type Brief = Record<string, any>;
 
@@ -54,8 +55,12 @@ export default function Home() {
 
   // Safely coerce possible array / object fields to display text
   const toLines = (value: any): string => {
-    if (Array.isArray(value)) return value.map(v => (typeof v === 'object' ? JSON.stringify(v) : String(v))).join("\n");
-    if (value && typeof value === 'object') return JSON.stringify(value, null, 2);
+    if (Array.isArray(value))
+      return value
+        .map((v) => (typeof v === "object" ? JSON.stringify(v) : String(v)))
+        .join("\n");
+    if (value && typeof value === "object")
+      return JSON.stringify(value, null, 2);
     if (value == null) return "";
     return String(value);
   };
@@ -73,13 +78,22 @@ export default function Home() {
       setBrief(null);
       if (!files || files.length === 0) throw new Error("Upload files first");
 
-      const form = new FormData();
-      for (let i = 0; i < files.length; i++) form.append("files", files[i]);
-      form.append("companyName", companyName);
+      // 1) Upload files to Vercel Blob via client SDK (streams, avoids body size limits)
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const { url } = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+        });
+        uploadedUrls.push(url);
+      }
 
-      const res = await fetch("/api/analyze-direct", {
+      // 2) Call analysis with Blob URLs (small JSON body)
+      const res = await fetch("/api/analyze", {
         method: "POST",
-        body: form,
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ urls: uploadedUrls, companyName }),
       });
       const contentType = res.headers.get("content-type") || "";
       if (!res.ok) {
@@ -101,7 +115,8 @@ export default function Home() {
 
   const totalFiles = files?.length || 0;
   const fileNames: string[] = [];
-  if (files) for (let i = 0; i < files.length; i++) fileNames.push(files[i].name);
+  if (files)
+    for (let i = 0; i < files.length; i++) fileNames.push(files[i].name);
 
   const onCopy = async () => {
     try {
@@ -139,7 +154,9 @@ export default function Home() {
               Startup Brief Generator
             </h1>
             <p className="mt-2 text-sm max-w-prose text-foreground/70 leading-relaxed">
-              Upload pitch materials or planning docs (PDF / DOCX). Get an investor-style synopsis: one-liner, problem, solution, GTM, TAM, risks & more.
+              Upload pitch materials or planning docs (PDF / DOCX). Get an
+              investor-style synopsis: one-liner, problem, solution, GTM, TAM,
+              risks & more.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -171,20 +188,31 @@ export default function Home() {
                   />
                   <div className="flex flex-col items-center gap-2 text-sm">
                     <span className="font-medium">
-                      {dragActive ? "Release to add" : "Drag & drop or click to select"}
+                      {dragActive
+                        ? "Release to add"
+                        : "Drag & drop or click to select"}
                     </span>
-                    <span className="text-xs opacity-70">PDF or DOCX • up to ~25MB each</span>
+                    <span className="text-xs opacity-70">
+                      PDF or DOCX • up to ~25MB each
+                    </span>
                     {totalFiles > 0 && (
-                      <span className="mt-1 outline-pill">{totalFiles} file{totalFiles > 1 ? "s" : ""} selected</span>
+                      <span className="mt-1 outline-pill">
+                        {totalFiles} file{totalFiles > 1 ? "s" : ""} selected
+                      </span>
                     )}
                   </div>
                 </div>
                 {totalFiles > 0 && (
                   <ul className="mt-4 space-y-1 max-h-40 overflow-auto pr-1 text-xs">
                     {fileNames.map((f) => (
-                      <li key={f} className="flex items-center gap-2 py-1 px-2 rounded-md bg-indigo-500/5 border border-indigo-500/10">
+                      <li
+                        key={f}
+                        className="flex items-center gap-2 py-1 px-2 rounded-md bg-indigo-500/5 border border-indigo-500/10"
+                      >
                         <span className="i-tabler-file-description text-indigo-400" />
-                        <span className="truncate flex-1" title={f}>{f}</span>
+                        <span className="truncate flex-1" title={f}>
+                          {f}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -209,13 +237,20 @@ export default function Home() {
                   className="btn-primary text-sm"
                 >
                   {analyzing ? (
-                    <span className="flex items-center gap-2"><span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" /> Processing…</span>
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />{" "}
+                      Processing…
+                    </span>
                   ) : (
-                    <span className="flex items-center gap-2"><span>Generate Brief</span></span>
+                    <span className="flex items-center gap-2">
+                      <span>Generate Brief</span>
+                    </span>
                   )}
                 </button>
                 {error && (
-                  <span className="text-xs text-red-500 font-medium">{error}</span>
+                  <span className="text-xs text-red-500 font-medium">
+                    {error}
+                  </span>
                 )}
               </div>
             </div>
@@ -225,10 +260,16 @@ export default function Home() {
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
                 <div className="card-title">Output</div>
-                <h2 className="text-lg font-semibold tracking-tight">VC Style Summary</h2>
+                <h2 className="text-lg font-semibold tracking-tight">
+                  VC Style Summary
+                </h2>
               </div>
               {brief && (
-                <button onClick={onCopy} className="copy-btn" disabled={analyzing}>
+                <button
+                  onClick={onCopy}
+                  className="copy-btn"
+                  disabled={analyzing}
+                >
                   {copied ? "Copied" : "Copy"}
                 </button>
               )}
@@ -237,7 +278,10 @@ export default function Home() {
             <div className="relative flex-1">
               {!brief && !analyzing && (
                 <div className="text-xs opacity-60 leading-relaxed">
-                  The generated brief will appear here with structured sections focusing on problem, solution differentiation, go-to-market motion, traction signals, addressed market sizing, core moat / defensibility angles and potential risk factors.
+                  The generated brief will appear here with structured sections
+                  focusing on problem, solution differentiation, go-to-market
+                  motion, traction signals, addressed market sizing, core moat /
+                  defensibility angles and potential risk factors.
                 </div>
               )}
               {analyzing && (
@@ -262,40 +306,80 @@ export default function Home() {
                     <div className="space-y-6">
                       {brief.one_liner && (
                         <div className="text-base md:text-lg font-semibold tracking-tight leading-snug bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
-                          {typeof brief.one_liner === 'object' ? brief.one_liner.text || JSON.stringify(brief.one_liner) : String(brief.one_liner)}
+                          {typeof brief.one_liner === "object"
+                            ? brief.one_liner.text ||
+                              JSON.stringify(brief.one_liner)
+                            : String(brief.one_liner)}
                         </div>
                       )}
                       <div className="grid gap-5 md:gap-6 text-[11px] md:text-[13px] leading-relaxed">
                         {[
-                          { key: 'problem', label: 'Problem' },
-                          { key: 'solution', label: 'Solution' },
-                          { key: 'icp_gtm', label: 'ICP & GTM', nested: ['icp','gtm'] },
-                          { key: 'traction_bullets', label: 'Traction' },
-                          { key: 'business_model', label: 'Business Model' },
-                          { key: 'tam', label: 'TAM', nested: ['global_market','target_segment','growth'] },
-                          { key: 'team', label: 'Team' },
-                          { key: 'moat_bullets', label: 'Moat / Defensibility' },
-                          { key: 'risks_bullets', label: 'Risks' },
-                          { key: 'why_now', label: 'Why Now' },
-                          { key: 'hypotheses', label: 'Hypotheses' },
-                          { key: 'founder_questions', label: 'Founder Questions' },
-                        ].map(section => {
+                          { key: "problem", label: "Problem" },
+                          { key: "solution", label: "Solution" },
+                          {
+                            key: "icp_gtm",
+                            label: "ICP & GTM",
+                            nested: ["icp", "gtm"],
+                          },
+                          { key: "traction_bullets", label: "Traction" },
+                          { key: "business_model", label: "Business Model" },
+                          {
+                            key: "tam",
+                            label: "TAM",
+                            nested: [
+                              "global_market",
+                              "target_segment",
+                              "growth",
+                            ],
+                          },
+                          { key: "team", label: "Team" },
+                          {
+                            key: "moat_bullets",
+                            label: "Moat / Defensibility",
+                          },
+                          { key: "risks_bullets", label: "Risks" },
+                          { key: "why_now", label: "Why Now" },
+                          { key: "hypotheses", label: "Hypotheses" },
+                          {
+                            key: "founder_questions",
+                            label: "Founder Questions",
+                          },
+                        ].map((section) => {
                           const val: any = (brief as any)[section.key];
-                          if (!val || (Array.isArray(val) && val.length === 0)) return null;
+                          if (!val || (Array.isArray(val) && val.length === 0))
+                            return null;
                           const renderVal = () => {
                             // Nested object special cases (icp_gtm, tam)
-                            if (section.nested && val && typeof val === 'object' && !Array.isArray(val)) {
+                            if (
+                              section.nested &&
+                              val &&
+                              typeof val === "object" &&
+                              !Array.isArray(val)
+                            ) {
                               return (
                                 <div className="space-y-2">
-                                  {section.nested.map(sub => {
+                                  {section.nested.map((sub) => {
                                     const node = val[sub];
                                     if (!node) return null;
-                                    const nodeText = typeof node === 'object' ? (node.text || JSON.stringify(node, null, 2)) : String(node);
-                                    const prettyLabel = sub.replace(/_/g,' ').replace(/\b\w/g, c=>c.toUpperCase());
+                                    const nodeText =
+                                      typeof node === "object"
+                                        ? node.text ||
+                                          JSON.stringify(node, null, 2)
+                                        : String(node);
+                                    const prettyLabel = sub
+                                      .replace(/_/g, " ")
+                                      .replace(/\b\w/g, (c) => c.toUpperCase());
                                     return (
-                                      <div key={sub} className="rounded-md bg-white/[0.02] p-2 border border-white/[0.04]">
-                                        <div className="text-[9px] uppercase tracking-wider font-semibold text-indigo-300/60 mb-1">{prettyLabel}</div>
-                                        <div className="text-[11px] md:text-[12px] leading-relaxed whitespace-pre-wrap opacity-90">{nodeText}</div>
+                                      <div
+                                        key={sub}
+                                        className="rounded-md bg-white/[0.02] p-2 border border-white/[0.04]"
+                                      >
+                                        <div className="text-[9px] uppercase tracking-wider font-semibold text-indigo-300/60 mb-1">
+                                          {prettyLabel}
+                                        </div>
+                                        <div className="text-[11px] md:text-[12px] leading-relaxed whitespace-pre-wrap opacity-90">
+                                          {nodeText}
+                                        </div>
                                       </div>
                                     );
                                   })}
@@ -304,26 +388,45 @@ export default function Home() {
                             }
                             if (Array.isArray(val)) {
                               // Hypotheses: objects with claim/status
-                              if (section.key === 'hypotheses') {
+                              if (section.key === "hypotheses") {
                                 return (
                                   <ul className="space-y-2">
                                     {val.map((h: any, i: number) => (
-                                      <li key={i} className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2.5">
-                                        {h.claim && <div className="font-medium text-[11px] md:text-[12px] leading-snug mb-1 text-amber-200/90">{h.claim}</div>}
-                                        {h.status && <div className="text-[10px] md:text-[11px] text-amber-300/70">{h.status}</div>}
+                                      <li
+                                        key={i}
+                                        className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2.5"
+                                      >
+                                        {h.claim && (
+                                          <div className="font-medium text-[11px] md:text-[12px] leading-snug mb-1 text-amber-200/90">
+                                            {h.claim}
+                                          </div>
+                                        )}
+                                        {h.status && (
+                                          <div className="text-[10px] md:text-[11px] text-amber-300/70">
+                                            {h.status}
+                                          </div>
+                                        )}
                                       </li>
                                     ))}
                                   </ul>
                                 );
                               }
                               // Founder questions: objects with question / rationale
-                              if (section.key === 'founder_questions') {
+                              if (section.key === "founder_questions") {
                                 return (
                                   <ol className="space-y-3 list-decimal pl-4 marker:text-indigo-300/60">
                                     {val.map((q: any, i: number) => (
                                       <li key={i} className="space-y-1">
-                                        {q.question && <div className="font-medium text-[11px] md:text-[12px] leading-snug text-indigo-100/90">{q.question}</div>}
-                                        {q.rationale && <div className="text-[10px] md:text-[11px] text-indigo-200/60">{q.rationale}</div>}
+                                        {q.question && (
+                                          <div className="font-medium text-[11px] md:text-[12px] leading-snug text-indigo-100/90">
+                                            {q.question}
+                                          </div>
+                                        )}
+                                        {q.rationale && (
+                                          <div className="text-[10px] md:text-[11px] text-indigo-200/60">
+                                            {q.rationale}
+                                          </div>
+                                        )}
                                       </li>
                                     ))}
                                   </ol>
@@ -333,20 +436,33 @@ export default function Home() {
                                 <ul className="list-disc pl-4 space-y-1 marker:text-indigo-400/70">
                                   {val.map((v: any, i: number) => (
                                     <li key={i} className="opacity-90">
-                                      {typeof v === 'object' ? (v.text || JSON.stringify(v)) : String(v)}
+                                      {typeof v === "object"
+                                        ? v.text || JSON.stringify(v)
+                                        : String(v)}
                                     </li>
                                   ))}
                                 </ul>
                               );
                             }
-                            if (typeof val === 'object') {
-                              const text = (val as any).text || JSON.stringify(val, null, 2);
-                              return <div className="whitespace-pre-wrap opacity-90 font-normal">{text}</div>;
+                            if (typeof val === "object") {
+                              const text =
+                                (val as any).text ||
+                                JSON.stringify(val, null, 2);
+                              return (
+                                <div className="whitespace-pre-wrap opacity-90 font-normal">
+                                  {text}
+                                </div>
+                              );
                             }
-                            return <div className="opacity-90">{String(val)}</div>;
+                            return (
+                              <div className="opacity-90">{String(val)}</div>
+                            );
                           };
                           return (
-                            <div key={section.key} className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2.5 border border-white/5">
+                            <div
+                              key={section.key}
+                              className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2.5 border border-white/5"
+                            >
                               <div className="text-[10px] uppercase font-semibold tracking-wider text-indigo-300/70 mb-1 flex items-center gap-1">
                                 <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                                 {section.label}
@@ -372,8 +488,13 @@ export default function Home() {
         </div>
 
         <footer className="mt-14 mb-4 text-center text-[11px] opacity-60 space-y-1">
-          <div>Built for rapid diligence workflows. Documents are processed transiently.</div>
-          <div>© Token Tribe • Loading may be slow depending on region/network.</div>
+          <div>
+            Built for rapid diligence workflows. Documents are processed
+            transiently.
+          </div>
+          <div>
+            © Token Tribe • Loading may be slow depending on region/network.
+          </div>
         </footer>
       </div>
 
