@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gemini } from "@/lib/vertex";
+import { chunkText } from "@/lib/chunk";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 async function fetchAsBuffer(
   url: string
@@ -62,29 +63,41 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Fetch and parse in parallel with a per-file timeout
+  const controller = new AbortController();
+  const perFileTimeoutMs = 60_000;
+  const tasks = urls.map(async (url) => {
+    const abort = setTimeout(() => controller.abort(), perFileTimeoutMs);
+    try {
+      const { buffer, contentType } = await fetchAsBuffer(url);
+      const lower = url.toLowerCase();
+      let text = "";
+      if (contentType.includes("pdf") || lower.endsWith(".pdf")) {
+        text = await parsePdf(buffer);
+      } else if (contentType.includes("word") || lower.endsWith(".docx")) {
+        text = await parseDocx(buffer);
+      } else {
+        try {
+          text = await parsePdf(buffer);
+        } catch {}
+        if (!text)
+          try {
+            text = await parseDocx(buffer);
+          } catch {}
+      }
+      const name = new URL(url).pathname.split("/").pop() || "file";
+      return { text, name };
+    } finally {
+      clearTimeout(abort);
+    }
+  });
+  const results = await Promise.allSettled(tasks);
   const texts: string[] = [];
   const names: string[] = [];
-  for (const url of urls) {
-    const { buffer, contentType } = await fetchAsBuffer(url);
-    const lower = url.toLowerCase();
-    let text = "";
-    if (contentType.includes("pdf") || lower.endsWith(".pdf")) {
-      text = await parsePdf(buffer);
-    } else if (contentType.includes("word") || lower.endsWith(".docx")) {
-      text = await parseDocx(buffer);
-    } else {
-      // best effort: try both, default to empty
-      try {
-        text = await parsePdf(buffer);
-      } catch {}
-      if (!text)
-        try {
-          text = await parseDocx(buffer);
-        } catch {}
-    }
-    if (text && text.trim()) {
-      texts.push(text);
-      names.push(new URL(url).pathname.split("/").pop() || "file");
+  for (const r of results) {
+    if (r.status === "fulfilled" && r.value.text && r.value.text.trim()) {
+      texts.push(r.value.text);
+      names.push(r.value.name);
     }
   }
 
@@ -95,8 +108,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const chunks = texts
-    .map((t, idx) => `From ${names[idx]}:\n\n${t}`)
+  // Cap total characters to protect model latency (~150k chars)
+  const MAX_TOTAL = 150_000;
+  let total = 0;
+  const bounded: string[] = [];
+  const boundedNames: string[] = [];
+  for (let i = 0; i < texts.length; i++) {
+    const t = texts[i];
+    if (total + t.length > MAX_TOTAL) break;
+    bounded.push(t);
+    boundedNames.push(names[i]);
+    total += t.length;
+  }
+  const chunks = bounded
+    .map((t, idx) => `From ${boundedNames[idx]}:\n\n${t}`)
     .join("\n\n---\n\n");
 
   const prompt = `You are a VC analyst. Produce ONLY valid JSON (no markdown fences, no commentary) matching EXACTLY this schema used by the UI:
