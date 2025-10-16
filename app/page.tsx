@@ -154,77 +154,282 @@ export default function Home() {
     return lines.join("\n").trim();
   };
 
-  // Download the Output panel as a PDF
+  // Build a custom 1-page A4 PDF (no screenshot) with a two-column layout
   const onDownloadPDF = useCallback(async () => {
     if (!brief) return;
     try {
-      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf"),
-      ]);
-      const node = outRef.current;
-      if (!node) return;
-
-      const canvas = await html2canvas(node, {
-        scale: window.devicePixelRatio > 1 ? 2 : 1.5,
-        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--background') || '#0b0b10',
-        ignoreElements: (el: Element) => {
-          const e = el as HTMLElement;
-          return e.dataset && (e.dataset.noexport === 'true' || e.dataset.noexport === '1');
-        },
-        onclone: (doc) => {
-          // Remove gradients and unsupported color functions (oklab/oklch/lab) and fix gradient-clipped text
-          const all = Array.from(doc.querySelectorAll('*')) as HTMLElement[];
-          const rootStyles = doc.defaultView?.getComputedStyle(doc.documentElement) ?? getComputedStyle(document.documentElement);
-          const fg = (rootStyles.getPropertyValue('--foreground') || '#1f2937').trim();
-          const bg = (rootStyles.getPropertyValue('--background') || '#ffffff').trim();
-          const hasUnsupported = (s?: string) => !!s && /(oklab\(|oklch\(|lab\(|lch\()/i.test(s);
-          const isTransparent = (s?: string) => s === 'rgba(0, 0, 0, 0)' || s === 'transparent';
-          all.forEach((el) => {
-            const cs = doc.defaultView?.getComputedStyle(el);
-            if (!cs) return;
-            const bgImage = cs.backgroundImage || '';
-            const bgShorthand = cs.background || '';
-            if (bgImage.includes('gradient(') || hasUnsupported(bgImage) || hasUnsupported(bgShorthand)) {
-              el.style.backgroundImage = 'none';
-              el.style.background = 'none';
-              if (isTransparent(cs.backgroundColor)) {
-                el.style.backgroundColor = bg;
-              }
-            }
-            const color = cs.color || '';
-            const clip = (cs as any).getPropertyValue?.('-webkit-background-clip') || (cs as any).backgroundClip || '';
-            if (isTransparent(color) || clip === 'text' || hasUnsupported(color)) {
-              el.style.color = fg;
-              (el.style as any)['-webkit-background-clip'] = 'initial';
-              el.style.backgroundClip = 'border-box';
-              if (el.style.backgroundImage) el.style.backgroundImage = 'none';
-            }
-            // Borders and outlines
-            const borderColor = cs.borderColor || '';
-            if (hasUnsupported(borderColor)) el.style.borderColor = fg + '33';
-            ['Top','Right','Bottom','Left'].forEach(side => {
-              const v = (cs as any)[`border${side}Color`] as string | undefined;
-              if (hasUnsupported(v)) (el.style as any)[`border${side}Color`] = fg + '33';
-            });
-            const outlineColor = cs.outlineColor || '';
-            if (hasUnsupported(outlineColor)) el.style.outlineColor = fg;
-            const boxShadow = cs.boxShadow || '';
-            if (hasUnsupported(boxShadow)) el.style.boxShadow = 'none';
-          });
-        },
-      });
-
-      const imgData = canvas.toDataURL('image/png');
+      const { default: jsPDF } = await import('jspdf');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const scale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
-      const imgWidth = canvas.width * scale;
-      const imgHeight = canvas.height * scale;
-      const x = (pageWidth - imgWidth) / 2;
-      const y = 0;
-      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+      const margin = 36; // 0.5"
+      const gutter = 18;
+      const contentWidth = pageWidth - margin * 2;
+      const leftW = Math.floor(contentWidth * 0.46);
+      const rightW = contentWidth - leftW - gutter;
+      const leftX = margin;
+      const rightX = margin + leftW + gutter;
+      let leftY = margin + 6;
+      let rightY = margin + 6;
+
+      const hexToRgb = (hex: string): [number, number, number] => {
+        const h = hex.replace('#', '');
+        const bigint = parseInt(h, 16);
+        return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+      };
+      const setStroke = (hex: string, w: number, cap: 'butt'|'round'|'square' = 'round') => {
+        const [r,g,b] = hexToRgb(hex);
+        (pdf as any).setLineCap && (pdf as any).setLineCap(cap);
+        pdf.setDrawColor(r,g,b);
+        pdf.setLineWidth(w);
+      };
+      const setFill = (hex: string) => {
+        const [r,g,b] = hexToRgb(hex);
+        pdf.setTextColor(r,g,b);
+      };
+      const textColor = (pdf as any).getTextColor ? (pdf as any).getTextColor() : undefined;
+
+      const gaugeColorFor = (score: number | null | undefined) => {
+        if (score == null) return '#94a3b8'; // slate-400
+        if (score < 40) return '#ef4444';
+        if (score < 70) return '#f59e0b';
+        return '#22c55e';
+      };
+      const drawSemiGauge = (
+        x: number,
+        y: number,
+        w: number,
+        score: number | null | undefined,
+        label: string,
+        emphasize = false
+      ) => {
+        const r = Math.min(w/2 - 4, 90);
+        const cx = x + w/2;
+        const cy = y + r + 10;
+        const trackColor = '#334155';
+        const strokeW = emphasize ? 8 : 6;
+        const safe = typeof score === 'number' ? Math.max(0, Math.min(100, score)) : null;
+        // Track
+        setStroke(trackColor, strokeW, 'butt');
+        const segments = 60; // smoothness
+        let prevX = cx - r, prevY = cy;
+        for (let i=1;i<=segments;i++) {
+          const t = i/segments;
+          const ang = Math.PI * (1 - t); // pi -> 0
+          const px = cx + Math.cos(ang) * r;
+          const py = cy - Math.sin(ang) * r;
+          pdf.line(prevX, prevY, px, py);
+          prevX = px; prevY = py;
+        }
+        // Value arc
+        if (safe != null && safe > 0) {
+          const color = gaugeColorFor(safe);
+          setStroke(color, strokeW, 'round');
+          const filledSeg = Math.max(1, Math.round((segments * safe) / 100));
+          prevX = cx - r; prevY = cy;
+          for (let i=1;i<=filledSeg;i++) {
+            const t = i/segments;
+            const ang = Math.PI * (1 - t);
+            const px = cx + Math.cos(ang) * r;
+            const py = cy - Math.sin(ang) * r;
+            pdf.line(prevX, prevY, px, py);
+            prevX = px; prevY = py;
+          }
+        }
+        // Number
+        pdf.setFont('helvetica', 'bold');
+        const fs = emphasize ? 28 : 20;
+        pdf.setFontSize(fs);
+        pdf.setTextColor(30,30,30);
+        pdf.text(String(safe == null ? 'N/A' : Math.round(safe)), cx, cy - r*0.2, { align: 'center' as any });
+        // Label
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(9);
+        pdf.setTextColor(60,60,60);
+        pdf.text(label.toUpperCase(), cx, cy + 18, { align: 'center' as any });
+        // return height consumed
+        return (r + 24) + 10; // arc height + label + padding
+      };
+
+      const addHeading = (text: string) => {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor(99,102,241); // indigo-ish
+        pdf.text(text.toUpperCase(), rightX, rightY);
+        rightY += 14;
+      };
+      const addParagraph = (text: string, maxW: number, color: [number,number,number] = [34,34,34]) => {
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(10);
+        const lines = pdf.splitTextToSize(text, maxW);
+        pdf.setTextColor(...color);
+        const lineH = 13;
+        for (const ln of lines) {
+          if (rightY > pageHeight - margin) break; // truncate to one page
+          pdf.text(ln, rightX, rightY);
+          rightY += lineH;
+        }
+        rightY += 6;
+      };
+      const toLinesStr = (value: any): string => {
+        if (Array.isArray(value)) return value.map(v => typeof v === 'object' ? (v.text ?? JSON.stringify(v)) : String(v)).join('\n');
+        if (value && typeof value === 'object') return String((value as any).text ?? JSON.stringify(value, null, 2));
+        if (value == null) return '';
+        return String(value);
+      };
+
+      // Left column: Overall big gauge, then other gauges
+      const ratings: any = (brief as any).ratings || {};
+      const order = ['overall','team_strength','market_quality','product_maturity','moat','traction','risk_profile','data_confidence'];
+      const items = order
+        .map(k => ({ key: k, label: (
+          k === 'overall' ? 'Overall' :
+          k === 'team_strength' ? 'Team Strength' :
+          k === 'market_quality' ? 'Market Quality' :
+          k === 'product_maturity' ? 'Product Maturity' :
+          k === 'risk_profile' ? 'Risk Profile' :
+          k === 'data_confidence' ? 'Data Confidence' :
+          k.charAt(0).toUpperCase() + k.slice(1).replace('_',' ')
+        ), score: ratings?.[k]?.score as number | undefined }))
+        .filter(e => typeof e.score === 'number' && (e.score as number) > 0);
+
+      const overall = items.find(i => i.key === 'overall');
+      const others = items.filter(i => i.key !== 'overall');
+
+      if (overall) {
+        // Big overall gauge
+        const consumed = drawSemiGauge(leftX, leftY, leftW, overall.score, 'Overall', true);
+        leftY += consumed + 8;
+      }
+      if (others.length > 0) {
+        // Render others in 3 columns grid of small gauges
+        const cols = 3;
+        const gap = 8;
+        const cellW = Math.floor((leftW - gap*(cols-1)) / cols);
+        let col = 0; let row = 0;
+        const baseY = leftY;
+        for (let i=0;i<others.length;i++) {
+          const e = others[i];
+          const gx = leftX + col*(cellW + gap);
+          const gy = baseY + row*90; // approx row height for small gauges
+          drawSemiGauge(gx, gy, cellW, e.score, e.label, false);
+          col++;
+          if (col >= cols) { col = 0; row++; }
+        }
+        // advance leftY to the bottom of the last row of gauges
+        const rowsUsed = row + (col > 0 ? 1 : 0);
+        leftY = baseY + rowsUsed*90 + 10;
+      }
+
+      // Right column: one-liner then sections
+      const oneLiner = toLinesStr((brief as any).one_liner);
+      if (oneLiner) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(13);
+        pdf.setTextColor(80, 39, 201);
+        const lines = pdf.splitTextToSize(oneLiner, rightW);
+        const lh = 15;
+        for (const ln of lines) {
+          if (rightY > pageHeight - margin) break;
+          pdf.text(ln, rightX, rightY);
+          rightY += lh;
+        }
+        rightY += 8;
+      }
+
+      // Build formatted sections with better handling for nested objects/lists
+      const formatICPGTM = (obj: any): string => {
+        if (!obj || typeof obj !== 'object') return toLinesStr(obj);
+        const parts: string[] = [];
+        if (obj.icp) {
+          const icpText = toLinesStr(obj.icp);
+          if (icpText) parts.push('ICP: ' + icpText);
+        }
+        if (obj.gtm) {
+          const gtmText = toLinesStr(obj.gtm);
+          if (gtmText) parts.push('GTM: ' + gtmText);
+        }
+        return parts.join('\n\n');
+      };
+      const formatTAM = (obj: any): string => {
+        if (!obj || typeof obj !== 'object') return toLinesStr(obj);
+        const map: Record<string,string> = {
+          global_market: 'Global Market',
+          target_segment: 'Target Segment',
+          growth: 'Growth'
+        };
+        const parts: string[] = [];
+        for (const key of Object.keys(map)) {
+          const node = (obj as any)[key];
+          if (!node) continue;
+          const txt = toLinesStr(node);
+          if (txt) parts.push(`${map[key]}: ${txt}`);
+        }
+        return parts.join('\n\n');
+      };
+      const formatList = (arr: any): string => {
+        if (!Array.isArray(arr)) return toLinesStr(arr);
+        return arr.map((v: any) => '• ' + (typeof v === 'object' ? (v.text ?? JSON.stringify(v)) : String(v))).join('\n');
+      };
+
+      type Section = { title: string; text: string };
+      const sections: Section[] = [];
+      const pushIf = (title: string, text: string) => { if (text && text.trim()) sections.push({ title, text: text.trim() }); };
+      pushIf('Problem', toLinesStr((brief as any).problem));
+      pushIf('Solution', toLinesStr((brief as any).solution));
+      pushIf('ICP & GTM', formatICPGTM((brief as any).icp_gtm));
+      pushIf('Traction', formatList((brief as any).traction_bullets));
+      pushIf('Business Model', toLinesStr((brief as any).business_model));
+      pushIf('TAM', formatTAM((brief as any).tam));
+      pushIf('Team', toLinesStr((brief as any).team));
+      pushIf('Moat', formatList((brief as any).moat_bullets));
+      pushIf('Risks', formatList((brief as any).risks_bullets));
+
+      const maxY = pageHeight - margin;
+      const writeSection = (s: Section) => {
+        // Heading: prefer right column; if no space there, try left below gauges
+        const writeHeadingTo = (x: number, yRef: 'right'|'left') => {
+          pdf.setFont('helvetica', 'bold');
+          pdf.setFontSize(11);
+          pdf.setTextColor(99,102,241);
+          const y = yRef === 'right' ? rightY : leftY;
+          pdf.text(s.title.toUpperCase(), x, y);
+          if (yRef === 'right') rightY += 14; else leftY += 14;
+        };
+        const writeParaTo = (x: number, w: number, yRef: 'right'|'left') => {
+          const lines = pdf.splitTextToSize(s.text, w);
+          pdf.setFont('helvetica', 'normal');
+          pdf.setFontSize(10);
+          pdf.setTextColor(34,34,34);
+          const lineH = 13;
+          let y = yRef === 'right' ? rightY : leftY;
+          for (const ln of lines) {
+            if (y >= maxY) return false; // full
+            pdf.text(ln, x, y);
+            y += lineH;
+          }
+          if (yRef === 'right') rightY = y + 6; else leftY = y + 6;
+          return true;
+        };
+
+        // Try right column first
+        if (rightY + 26 < maxY) {
+          writeHeadingTo(rightX, 'right');
+          if (!writeParaTo(rightX, rightW, 'right')) {
+            // Continue on left if space
+            if (leftY + 26 < maxY) {
+              writeHeadingTo(leftX, 'left');
+              writeParaTo(leftX, leftW, 'left');
+            }
+          }
+        } else if (leftY + 26 < maxY) {
+          writeHeadingTo(leftX, 'left');
+          writeParaTo(leftX, leftW, 'left');
+        }
+      };
+
+      sections.forEach(writeSection);
+
       pdf.save(`${companyName ? companyName + '-' : ''}vc-summary.pdf`);
     } catch (e) {
       console.error('PDF export failed', e);
