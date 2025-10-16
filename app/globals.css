@@ -170,6 +170,7 @@ body {
   align-items: center;
   gap: .35rem;
   transition: background .25s ease, color .25s ease;
+  cursor: pointer;
 }
 .copy-btn:hover { background: rgba(99,102,241,0.18); }
 .dark .copy-btn { color: #a5b4ff; }
