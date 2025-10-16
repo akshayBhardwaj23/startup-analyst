@@ -4,6 +4,105 @@ import { upload } from "@vercel/blob/client";
 
 type Brief = Record<string, any>;
 
+// Speedometer Gauge component (0-100). Semi-circle with needle.
+function Gauge({
+  label,
+  score,
+  emphasis = false,
+  scale = 1,
+}: {
+  label: string;
+  score: number | null | undefined;
+  emphasis?: boolean;
+  scale?: number;
+}) {
+  const safe = typeof score === "number" ? Math.min(100, Math.max(0, score)) : null;
+  // Dimensions (emphasis + scale)
+  const baseW = emphasis ? 160 : 120;
+  const baseH = emphasis ? 90 : 68;
+  const baseR = emphasis ? 60 : 50;
+  const width = Math.round(baseW * scale);
+  const height = Math.round(baseH * scale);
+  const cx = width / 2;
+  const cy = height - 6; // add padding to avoid clipping the stroke
+  const r = Math.round(baseR * scale);
+
+  const angleFor = (s: number) => Math.PI - (s / 100) * Math.PI; // pi -> 0 (left -> right)
+  const endAngle = safe != null ? angleFor(safe) : Math.PI;
+
+  const startX = cx - r;
+  const startY = cy;
+  const fullEndX = cx + r;
+  const fullEndY = cy;
+  // For smooth proportional fill, we render the value arc using stroke-dasharray
+  // on the same semi-circle path with pathLength=100 (so dash = score%).
+
+  const color = safe == null
+    ? "#94a3b8" // slate-400
+    : safe < 40
+      ? "#ef4444" // red-500
+      : safe < 70
+        ? "#f59e0b" // amber-500
+        : "#22c55e"; // green-500
+
+  const strokeW = emphasis ? 8 : 6;
+  const fontSize = Math.round(r * (emphasis ? 0.68 : 0.58));
+  const numberY = cy - r * 0.2;
+  // To avoid a visible round "dot" at the end of the value arc when using rounded caps,
+  // we slightly shorten the dash length and add a tiny negative dash offset so both caps
+  // sit within the arc instead of protruding beyond the extreme endpoints.
+  const capComp = 0.8; // in pathLength units (0-100)
+  const dashLen = safe != null ? Math.max(0, Math.min(100, safe - capComp)) : 0;
+  const dashGap = 100 - dashLen;
+  const dashOffset = -capComp / 2;
+
+  return (
+    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        className="block"
+        aria-label={`${label} ${safe == null ? "N/A" : Math.round(safe)}`}
+      >
+        {/* Track */}
+        <path
+          d={`M ${startX} ${startY} A ${r} ${r} 0 0 1 ${fullEndX} ${fullEndY}`}
+          fill="none"
+          stroke="#334155" /* slate-700 */
+          strokeWidth={strokeW}
+          strokeLinecap="butt"
+        />
+        {/* Meter (value arc) */}
+        {safe != null && safe > 0 && (
+          <path
+            d={`M ${startX} ${startY} A ${r} ${r} 0 0 1 ${fullEndX} ${fullEndY}`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeW}
+            strokeLinecap="round"
+            pathLength={100}
+            strokeDasharray={`${dashLen} ${dashGap}`}
+            strokeDashoffset={dashOffset}
+          />
+        )}
+        {/* Number inside the arc */}
+        {safe != null ? (
+          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-white" fontSize={fontSize} fontWeight={700}>
+            {Math.round(safe)}
+          </text>
+        ) : (
+          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-400" fontSize={Math.max(10, fontSize - 2)}>
+            N/A
+          </text>
+        )}
+      </svg>
+      <div className="mt-0.5 text-center text-[10px] uppercase tracking-wider text-foreground/60 font-semibold">
+        {label}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [files, setFiles] = useState<FileList | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -49,6 +148,7 @@ export default function Home() {
     add("Why now", b.why_now);
     add("Hypotheses", b.hypotheses);
     add("Founder questions", b.founder_questions);
+    add("Ratings", b.ratings);
 
     return lines.join("\n").trim();
   };
@@ -310,6 +410,110 @@ export default function Home() {
                             ? brief.one_liner.text ||
                               JSON.stringify(brief.one_liner)
                             : String(brief.one_liner)}
+                        </div>
+                      )}
+                      {/* Ratings speedometers */}
+                      {brief.ratings && (
+                        <div className="space-y-3">
+                          {(() => {
+                            const r = (brief as any).ratings || {};
+
+                            // Build present entries in preferred order
+                            const entries = [
+                              { key: 'overall', label: 'Overall', score: r.overall?.score as number | undefined, emphasis: true },
+                              { key: 'team_strength', label: 'Team Strength', score: r.team_strength?.score as number | undefined },
+                              { key: 'market_quality', label: 'Market Quality', score: r.market_quality?.score as number | undefined },
+                              { key: 'product_maturity', label: 'Product Maturity', score: r.product_maturity?.score as number | undefined },
+                              { key: 'moat', label: 'Moat', score: r.moat?.score as number | undefined },
+                              { key: 'traction', label: 'Traction', score: r.traction?.score as number | undefined },
+                              { key: 'risk_profile', label: 'Risk Profile', score: r.risk_profile?.score as number | undefined },
+                              { key: 'data_confidence', label: 'Data Confidence', score: r.data_confidence?.score as number | undefined },
+                            ].filter((e) => typeof e.score === 'number' && (e.score as number) > 0) as Array<{ key: string; label: string; score: number; emphasis?: boolean }>;
+
+                            if (entries.length === 0) return null;
+
+                            const hasOverall = entries.some((e) => e.key === 'overall');
+                            let topRow: typeof entries = [];
+                            let bottomRow: typeof entries = [];
+
+                            if (hasOverall) {
+                              const overall = entries.find((e) => e.key === 'overall')!;
+                              const rest = entries.filter((e) => e.key !== 'overall');
+                              topRow = [overall, ...rest.slice(0, 2)]; // Overall + up to 2 others
+                              bottomRow = rest.slice(2);
+                            } else {
+                              topRow = entries.slice(0, 3); // up to 3
+                              bottomRow = entries.slice(3);
+                            }
+
+                            // Helper to choose md:grid-cols-* class from count (keep strings literal for Tailwind JIT)
+                            const mdCols = (n: number) =>
+                              n <= 1
+                                ? 'md:grid-cols-1'
+                                : n === 2
+                                ? 'md:grid-cols-2'
+                                : n === 3
+                                ? 'md:grid-cols-3'
+                                : n === 4
+                                ? 'md:grid-cols-4'
+                                : 'md:grid-cols-5';
+
+                            // Sizing: emphasize Overall; bump scales a bit for compact rows
+                            const topOtherCount = hasOverall ? Math.max(0, topRow.length - 1) : topRow.length;
+                            const overallScale = hasOverall ? (topOtherCount <= 1 ? 1.15 : 1.05) : 1;
+                            const topScale = topOtherCount <= 1 ? 1.1 : 1;
+                            const bottomScale = bottomRow.length <= 3 ? 1.1 : 1;
+
+                            return (
+                              <>
+                                {/* Top row */}
+                                {hasOverall ? (
+                                  <>
+                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                                      {/* Mobile: Overall full-width first row */}
+                                      <div className="col-span-1 md:col-span-3">
+                                        <Gauge label="Overall" score={topRow[0].score} emphasis scale={overallScale} />
+                                      </div>
+                                      {/* Desktop (md+): other top items inline; Mobile: remaining items flow below in two columns */}
+                                      {topRow.slice(1).map((e) => (
+                                        <div key={e.key} className="hidden md:block md:col-span-1">
+                                          <Gauge label={e.label} score={e.score} scale={topScale} />
+                                        </div>
+                                      ))}
+                                    </div>
+                                    {/* Mobile-only layout for the rest: 2 per row */}
+                                    {topRow.length > 1 && (
+                                      <div className="md:hidden grid grid-cols-2 gap-3">
+                                        {topRow.slice(1).map((e) => (
+                                          <Gauge key={e.key} label={e.label} score={e.score} scale={topScale} />
+                                        ))}
+                                      </div>
+                                    )}
+                                  </>
+                                ) : (
+                                  // No Overall: on mobile show two per row; desktop keeps dynamic columns
+                                  <div className={`grid grid-cols-2 md:grid-cols-${Math.min(5, Math.max(1, topRow.length))} gap-3`}>
+                                    {topRow.map((e) => (
+                                      <Gauge key={e.key} label={e.label} score={e.score} scale={topScale} />
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Bottom row (remaining gauges) */}
+                                {bottomRow.length > 0 && (
+                                  // On mobile, show two per row for remaining gauges; desktop keeps dynamic columns
+                                  <div className={`grid grid-cols-2 ${mdCols(bottomRow.length)} gap-3`}>
+                                    {bottomRow.map((e) => (
+                                      <Gauge key={e.key} label={e.label} score={e.score} scale={bottomScale} />
+                                    ))}
+                                  </div>
+                                )}
+                              </>
+                            );
+                          })()}
+                          {/* First row: Overall (large), Team Strength, Market Quality */}
+                          {/* Legacy layout retained as fallback above via IIFE */}
+                          {/* Rationale removed by request */}
                         </div>
                       )}
                       <div className="grid gap-5 md:gap-6 text-[11px] md:text-[13px] leading-relaxed">

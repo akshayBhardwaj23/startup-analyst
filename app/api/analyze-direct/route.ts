@@ -100,7 +100,16 @@ export async function POST(req: NextRequest) {
   "risks_bullets": [ {"text":"...","refs":[...]}, ... ],
   "why_now": {"text":"...","refs":[...]},
   "hypotheses": [ {"claim":"...","status":"NO-EVIDENCE|SUPPORTED","refs":[...]}, ... ],
-  "founder_questions": [ {"question":"...","rationale":"..."}, ... ]
+  "founder_questions": [ {"question":"...","rationale":"..."}, ... ],
+  "ratings": {
+    "overall":         {"score":0,"refs":[...]},
+    "team_strength":   {"score":0,"refs":[...]},
+    "market_quality":  {"score":0,"refs":[...]},
+    "product_maturity":{"score":0,"refs":[...]},
+    "moat":            {"score":0,"refs":[...]},
+    "traction":        {"score":0,"refs":[...]},
+    "risk_profile":    {"score":0,"refs":[...]},
+  }
 }
 
 Rules:
@@ -111,6 +120,9 @@ Rules:
 - Bullet arrays (traction_bullets, moat_bullets, risks_bullets) = objects with text + refs.
 - Keep language concise, analyst tone.
 - Do NOT invent numbers; if TAM components not present, still include keys with empty text "" and empty refs [].
+- Ratings:
+  - Provide a numeric "score" from 0-100 for each rating key (0=very weak, 50=average/unclear, 100=very strong).
+  - Always give the "overall" ratings based on whatever information is given.
 - Always include every top-level key even if text is empty.
 - Output must be pure JSON with no leading or trailing characters.
 
