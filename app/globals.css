@@ -13,11 +13,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Explicit theme classes override system preference */
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+html.light {
+  /* Slightly darker light theme */
+  --background: #f6f7fb; /* was #ffffff */
+  --foreground: #141414; /* was #171717 */
 }
 
 body {
@@ -57,12 +61,10 @@ body {
   border: 1px solid rgba(255,255,255,0.4);
   box-shadow: 0 4px 16px -2px rgba(0,0,0,0.08), 0 8px 32px -4px rgba(0,0,0,0.08);
 }
-@media (prefers-color-scheme: dark) {
-  .glass {
-    background: linear-gradient(135deg, rgba(30,30,35,0.72), rgba(30,30,40,0.4));
-    border-color: rgba(255,255,255,0.05);
-    box-shadow: 0 4px 20px -2px rgba(0,0,0,0.5), 0 8px 32px -4px rgba(0,0,0,0.45);
-  }
+.dark .glass {
+  background: linear-gradient(135deg, rgba(30,30,35,0.72), rgba(30,30,40,0.4));
+  border-color: rgba(255,255,255,0.05);
+  box-shadow: 0 4px 20px -2px rgba(0,0,0,0.5), 0 8px 32px -4px rgba(0,0,0,0.45);
 }
 
 .fade-in { animation: fadeIn 0.5s ease forwards; }
@@ -155,9 +157,7 @@ body {
   background: linear-gradient(135deg,rgba(99,102,241,0.1),rgba(139,92,246,0.1));
   color: #6366f1;
 }
-@media (prefers-color-scheme: dark) {
-  .outline-pill { color: #a5b4ff; border-color: rgba(129,140,248,0.5); }
-}
+.dark .outline-pill { color: #a5b4ff; border-color: rgba(129,140,248,0.5); }
 
 .copy-btn {
   font-size: .7rem;
@@ -172,9 +172,7 @@ body {
   transition: background .25s ease, color .25s ease;
 }
 .copy-btn:hover { background: rgba(99,102,241,0.18); }
-@media (prefers-color-scheme: dark) {
-  .copy-btn { color: #a5b4ff; }
-}
+.dark .copy-btn { color: #a5b4ff; }
 
 .panel {
   border-radius: 1.25rem;
