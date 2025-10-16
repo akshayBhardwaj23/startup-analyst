@@ -545,7 +545,7 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             <div className="pulse-dot" />
-            <span className="text-xs font-medium opacity-70">Alpha</span>
+            <span className="text-xs font-medium opacity-70">General Release</span>
           </div>
         </header>
 
