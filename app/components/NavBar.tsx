@@ -7,6 +7,8 @@ import Image from "next/image";
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "Team" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
 ];
 
 export default function NavBar() {
