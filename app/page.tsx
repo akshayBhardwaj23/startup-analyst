@@ -169,8 +169,74 @@ export default function Home() {
       const rightW = contentWidth - leftW - gutter;
       const leftX = margin;
       const rightX = margin + leftW + gutter;
-      let leftY = margin + 6;
-      let rightY = margin + 6;
+      // Header: logo + company name + website URL
+      // Load logo from public folder
+      const loadImage = (src: string) =>
+        new Promise<HTMLImageElement>((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+
+      const headerHeight = 48; // pts
+      try {
+        const logo = await loadImage('/brand-icon.png');
+        const logoSize = 28; // pts
+        const logoY = margin + (headerHeight - logoSize) / 2;
+        pdf.addImage(logo as any, 'PNG', margin, logoY, logoSize, logoSize);
+      } catch {}
+
+      // Company name
+      const nameX = margin + 36; // some space after logo
+      const nameY = margin + 20; // first line baseline
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(14);
+      pdf.setTextColor(30, 30, 30);
+      pdf.text('Startup Analyst XI', nameX, nameY);
+
+      // Website URL (clickable)
+      const url = 'https://startup-analyst-xi.vercel.app/';
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(10);
+      pdf.setTextColor(56, 116, 203); // link-ish blue
+      const urlY = nameY + 14;
+      pdf.text(url, nameX, urlY);
+      try {
+        const urlW = (pdf as any).getTextWidth ? (pdf as any).getTextWidth(url) : 140;
+        pdf.link(nameX, urlY - 10, urlW, 14, { url });
+      } catch {}
+
+      // Top-right: user-entered company name
+      if (companyName && companyName.trim()) {
+        const rightLabel = companyName.trim();
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(11);
+        pdf.setTextColor(60, 60, 60);
+        // Constrain to avoid overlapping the left header block
+        const maxRightWidth = contentWidth * 0.44; // roughly the right column width
+        const getW = (t: string) => (pdf as any).getTextWidth ? (pdf as any).getTextWidth(t) : t.length * 6;
+        let display = rightLabel;
+        if (getW(display) > maxRightWidth) {
+          // Truncate with ellipsis until it fits
+          while (display.length > 1 && getW(display + '…') > maxRightWidth) {
+            display = display.slice(0, -1);
+          }
+          display += '…';
+        }
+        // Align to the right margin at the same baseline as company title on the left
+        pdf.text(display, pageWidth - margin, nameY, { align: 'right' as any });
+      }
+
+      // Divider under header
+      (pdf as any).setLineCap && (pdf as any).setLineCap('butt');
+      pdf.setDrawColor(230, 230, 235);
+      pdf.setLineWidth(0.8);
+      pdf.line(margin, margin + headerHeight, pageWidth - margin, margin + headerHeight);
+
+      let leftY = margin + headerHeight + 10;
+      let rightY = margin + headerHeight + 10;
 
       const hexToRgb = (hex: string): [number, number, number] => {
         const h = hex.replace('#', '');
@@ -609,7 +675,7 @@ export default function Home() {
                   type="text"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Acme Robotics"
+                  placeholder="Write Company Name here"
                   className="w-full rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/60 transition"
                 />
               </div>
@@ -623,7 +689,7 @@ export default function Home() {
                   {analyzing ? (
                     <span className="flex items-center gap-2">
                       <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />{" "}
-                      Processing…
+                      Thinking…
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
