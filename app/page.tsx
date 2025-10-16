@@ -38,7 +38,7 @@ function Gauge({
   // on the same semi-circle path with pathLength=100 (so dash = score%).
 
   const color = safe == null
-    ? "#94a3b8" // slate-400
+    ? "#1b62c7ff" // slate-400
     : safe < 40
       ? "#ef4444" // red-500
       : safe < 70
@@ -57,7 +57,7 @@ function Gauge({
   const dashOffset = -capComp / 2;
 
   return (
-    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2">
+    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2 text-[color:var(--foreground)]">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
@@ -87,16 +87,16 @@ function Gauge({
         )}
         {/* Number inside the arc */}
         {safe != null ? (
-          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-white" fontSize={fontSize} fontWeight={700}>
+          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-current" fontSize={fontSize} fontWeight={700}>
             {Math.round(safe)}
           </text>
         ) : (
-          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-400" fontSize={Math.max(10, fontSize - 2)}>
+          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-current opacity-60" fontSize={Math.max(10, fontSize - 2)}>
             N/A
           </text>
         )}
       </svg>
-      <div className="mt-0.5 text-center text-[10px] uppercase tracking-wider text-foreground/60 font-semibold">
+      <div className="mt-0.5 text-center text-[10px] uppercase tracking-wider font-semibold opacity-60 text-[color:var(--foreground)]">
         {label}
       </div>
     </div>
