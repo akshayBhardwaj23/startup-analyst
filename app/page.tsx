@@ -111,6 +111,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const dropRef = useRef<HTMLDivElement | null>(null);
+  const outRef = useRef<HTMLDivElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
   const formatBriefToText = (b: any) => {
@@ -152,6 +153,84 @@ export default function Home() {
 
     return lines.join("\n").trim();
   };
+
+  // Download the Output panel as a PDF
+  const onDownloadPDF = useCallback(async () => {
+    if (!brief) return;
+    try {
+      const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const node = outRef.current;
+      if (!node) return;
+
+      const canvas = await html2canvas(node, {
+        scale: window.devicePixelRatio > 1 ? 2 : 1.5,
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--background') || '#0b0b10',
+        ignoreElements: (el: Element) => {
+          const e = el as HTMLElement;
+          return e.dataset && (e.dataset.noexport === 'true' || e.dataset.noexport === '1');
+        },
+        onclone: (doc) => {
+          // Remove gradients and unsupported color functions (oklab/oklch/lab) and fix gradient-clipped text
+          const all = Array.from(doc.querySelectorAll('*')) as HTMLElement[];
+          const rootStyles = doc.defaultView?.getComputedStyle(doc.documentElement) ?? getComputedStyle(document.documentElement);
+          const fg = (rootStyles.getPropertyValue('--foreground') || '#1f2937').trim();
+          const bg = (rootStyles.getPropertyValue('--background') || '#ffffff').trim();
+          const hasUnsupported = (s?: string) => !!s && /(oklab\(|oklch\(|lab\(|lch\()/i.test(s);
+          const isTransparent = (s?: string) => s === 'rgba(0, 0, 0, 0)' || s === 'transparent';
+          all.forEach((el) => {
+            const cs = doc.defaultView?.getComputedStyle(el);
+            if (!cs) return;
+            const bgImage = cs.backgroundImage || '';
+            const bgShorthand = cs.background || '';
+            if (bgImage.includes('gradient(') || hasUnsupported(bgImage) || hasUnsupported(bgShorthand)) {
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+              if (isTransparent(cs.backgroundColor)) {
+                el.style.backgroundColor = bg;
+              }
+            }
+            const color = cs.color || '';
+            const clip = (cs as any).getPropertyValue?.('-webkit-background-clip') || (cs as any).backgroundClip || '';
+            if (isTransparent(color) || clip === 'text' || hasUnsupported(color)) {
+              el.style.color = fg;
+              (el.style as any)['-webkit-background-clip'] = 'initial';
+              el.style.backgroundClip = 'border-box';
+              if (el.style.backgroundImage) el.style.backgroundImage = 'none';
+            }
+            // Borders and outlines
+            const borderColor = cs.borderColor || '';
+            if (hasUnsupported(borderColor)) el.style.borderColor = fg + '33';
+            ['Top','Right','Bottom','Left'].forEach(side => {
+              const v = (cs as any)[`border${side}Color`] as string | undefined;
+              if (hasUnsupported(v)) (el.style as any)[`border${side}Color`] = fg + '33';
+            });
+            const outlineColor = cs.outlineColor || '';
+            if (hasUnsupported(outlineColor)) el.style.outlineColor = fg;
+            const boxShadow = cs.boxShadow || '';
+            if (hasUnsupported(boxShadow)) el.style.boxShadow = 'none';
+          });
+        },
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const scale = Math.min(pageWidth / canvas.width, pageHeight / canvas.height);
+      const imgWidth = canvas.width * scale;
+      const imgHeight = canvas.height * scale;
+      const x = (pageWidth - imgWidth) / 2;
+      const y = 0;
+      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+      pdf.save(`${companyName ? companyName + '-' : ''}vc-summary.pdf`);
+    } catch (e) {
+      console.error('PDF export failed', e);
+      setError('Failed to generate PDF');
+    }
+  }, [brief, companyName]);
 
   // Safely coerce possible array / object fields to display text
   const toLines = (value: any): string => {
@@ -247,7 +326,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
-      <div className="max-w-5xl mx-auto">
+  <div className="max-w-screen-2xl mx-auto">
         <header className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">
@@ -265,8 +344,8 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="grid gap-8 md:grid-cols-2">
-          <section className="panel glass relative overflow-hidden">
+        <div className="grid gap-8 md:grid-cols-5">
+          <section className="panel glass relative overflow-hidden md:col-span-2">
             <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-gradient-to-tr from-indigo-500/20 via-fuchsia-500/20 to-pink-500/20 blur-3xl" />
             <div className="relative space-y-6">
               <div>
@@ -356,7 +435,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="panel glass brief flex flex-col min-h-[420px] relative">
+          <section className="panel glass brief flex flex-col min-h-[420px] relative md:col-span-3" ref={outRef}>
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
                 <div className="card-title">Output</div>
@@ -365,13 +444,21 @@ export default function Home() {
                 </h2>
               </div>
               {brief && (
-                <button
-                  onClick={onCopy}
-                  className="copy-btn"
-                  disabled={analyzing}
-                >
-                  {copied ? "Copied" : "Copy"}
-                </button>
+                <div className="flex items-center gap-2" data-noexport="true">
+                  <button
+                    onClick={onDownloadPDF}
+                    className="copy-btn flex items-center gap-2"
+                    disabled={analyzing}
+                    title="Download PDF"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" x2="12" y1="15" y2="3" />
+                    </svg>
+                    <span>Download PDF</span>
+                  </button>
+                </div>
               )}
             </div>
             <div className="divider" />
@@ -433,21 +520,12 @@ export default function Home() {
                             if (entries.length === 0) return null;
 
                             const hasOverall = entries.some((e) => e.key === 'overall');
-                            let topRow: typeof entries = [];
-                            let bottomRow: typeof entries = [];
-
-                            if (hasOverall) {
-                              const overall = entries.find((e) => e.key === 'overall')!;
-                              const rest = entries.filter((e) => e.key !== 'overall');
-                              topRow = [overall, ...rest.slice(0, 2)]; // Overall + up to 2 others
-                              bottomRow = rest.slice(2);
-                            } else {
-                              topRow = entries.slice(0, 3); // up to 3
-                              bottomRow = entries.slice(3);
-                            }
+                            const overall = hasOverall ? entries.find((e) => e.key === 'overall')! : null;
+                            const rest = hasOverall ? entries.filter((e) => e.key !== 'overall') : entries;
+                            const all = hasOverall && overall ? [overall, ...rest] : rest;
 
                             // Helper to choose md:grid-cols-* class from count (keep strings literal for Tailwind JIT)
-                            const mdCols = (n: number) =>
+                            const mdColsAll = (n: number) =>
                               n <= 1
                                 ? 'md:grid-cols-1'
                                 : n === 2
@@ -456,55 +534,51 @@ export default function Home() {
                                 ? 'md:grid-cols-3'
                                 : n === 4
                                 ? 'md:grid-cols-4'
-                                : 'md:grid-cols-5';
+                                : n === 5
+                                ? 'md:grid-cols-5'
+                                : n === 6
+                                ? 'md:grid-cols-6'
+                                : n === 7
+                                ? 'md:grid-cols-7'
+                                : 'md:grid-cols-8';
 
-                            // Sizing: emphasize Overall; bump scales a bit for compact rows
-                            const topOtherCount = hasOverall ? Math.max(0, topRow.length - 1) : topRow.length;
-                            const overallScale = hasOverall ? (topOtherCount <= 1 ? 1.15 : 1.05) : 1;
-                            const topScale = topOtherCount <= 1 ? 1.1 : 1;
-                            const bottomScale = bottomRow.length <= 3 ? 1.1 : 1;
+                            const overallScale = hasOverall ? 1.1 : 1; // slight emphasis
+                            const itemScale = 1;
 
                             return (
                               <>
-                                {/* Top row */}
+                                {/* Desktop: all gauges in one row */}
+                                <div className={`hidden md:grid ${mdColsAll(all.length)} gap-3`}>
+                                  {all.map((e) => (
+                                    <Gauge
+                                      key={e.key}
+                                      label={e.label}
+                                      score={e.score}
+                                      emphasis={hasOverall && e.key === 'overall'}
+                                      scale={hasOverall && e.key === 'overall' ? overallScale : itemScale}
+                                    />
+                                  ))}
+                                </div>
+
+                                {/* Mobile: Overall full-width first, then others 2-per-row */}
                                 {hasOverall ? (
                                   <>
-                                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                                      {/* Mobile: Overall full-width first row */}
-                                      <div className="col-span-1 md:col-span-3">
-                                        <Gauge label="Overall" score={topRow[0].score} emphasis scale={overallScale} />
-                                      </div>
-                                      {/* Desktop (md+): other top items inline; Mobile: remaining items flow below in two columns */}
-                                      {topRow.slice(1).map((e) => (
-                                        <div key={e.key} className="hidden md:block md:col-span-1">
-                                          <Gauge label={e.label} score={e.score} scale={topScale} />
-                                        </div>
-                                      ))}
+                                    <div className="grid grid-cols-1 gap-3 md:hidden">
+                                      <Gauge label="Overall" score={overall!.score} emphasis scale={overallScale} />
                                     </div>
-                                    {/* Mobile-only layout for the rest: 2 per row */}
-                                    {topRow.length > 1 && (
-                                      <div className="md:hidden grid grid-cols-2 gap-3">
-                                        {topRow.slice(1).map((e) => (
-                                          <Gauge key={e.key} label={e.label} score={e.score} scale={topScale} />
+                                    {rest.length > 0 && (
+                                      <div className="grid grid-cols-2 gap-3 md:hidden">
+                                        {rest.map((e) => (
+                                          <Gauge key={e.key} label={e.label} score={e.score} scale={itemScale} />
                                         ))}
                                       </div>
                                     )}
                                   </>
                                 ) : (
-                                  // No Overall: on mobile show two per row; desktop keeps dynamic columns
-                                  <div className={`grid grid-cols-2 md:grid-cols-${Math.min(5, Math.max(1, topRow.length))} gap-3`}>
-                                    {topRow.map((e) => (
-                                      <Gauge key={e.key} label={e.label} score={e.score} scale={topScale} />
-                                    ))}
-                                  </div>
-                                )}
-
-                                {/* Bottom row (remaining gauges) */}
-                                {bottomRow.length > 0 && (
-                                  // On mobile, show two per row for remaining gauges; desktop keeps dynamic columns
-                                  <div className={`grid grid-cols-2 ${mdCols(bottomRow.length)} gap-3`}>
-                                    {bottomRow.map((e) => (
-                                      <Gauge key={e.key} label={e.label} score={e.score} scale={bottomScale} />
+                                  // No Overall: just 2-per-row on mobile
+                                  <div className="grid grid-cols-2 gap-3 md:hidden">
+                                    {all.map((e) => (
+                                      <Gauge key={e.key} label={e.label} score={e.score} scale={itemScale} />
                                     ))}
                                   </div>
                                 )}
