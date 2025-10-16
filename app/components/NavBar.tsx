@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const links = [
@@ -13,6 +13,7 @@ export default function NavBar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const firstFocusRef = useRef<HTMLAnchorElement | null>(null);
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -25,6 +26,22 @@ export default function NavBar() {
     root.classList.remove('dark','light');
     root.classList.add(dark ? 'dark' : 'light');
   }, []);
+
+  // Close mobile menu on ESC
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // Initial focus when menu opens (no body scroll lock for subtle UX)
+  useEffect(() => {
+    if (open) {
+      requestAnimationFrame(() => firstFocusRef.current?.focus());
+    }
+  }, [open]);
 
   const toggleTheme = () => {
     if (typeof document === 'undefined') return;
@@ -46,18 +63,20 @@ export default function NavBar() {
         </div>
         {/* Right: Links + Theme toggle + mobile menu */}
         <div className="flex items-center gap-2">
-          <ul className={`md:flex items-center gap-1 text-sm font-medium ${open ? 'absolute left-0 right-0 top-14 flex flex-col bg-background/90 backdrop-blur-xl p-4 border-b border-white/5' : 'hidden md:flex'}`}>
+          {/* Desktop navigation */}
+          <ul className="hidden md:flex items-center gap-1 text-sm font-medium">
             {links.map(l => {
               const active = pathname === l.href;
               return (
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    onClick={() => setOpen(false)}
                     className={`px-3 py-2 rounded-lg transition relative block ${active ? 'text-indigo-400' : 'opacity-75 hover:opacity-100'} hover:text-indigo-300`}
                   >
                     {l.label}
-                    {active && <span className="absolute inset-x-2 -bottom-px h-px bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent" />}
+                    {active && (
+                      <span className="absolute inset-x-2 -bottom-px h-px bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent" />
+                    )}
                   </Link>
                 </li>
               );
@@ -96,11 +115,49 @@ export default function NavBar() {
             className="md:hidden text-xs px-3 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10"
             onClick={() => setOpen(o => !o)}
             aria-label="Toggle navigation"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-haspopup="dialog"
           >
             {open ? 'Close' : 'Menu'}
           </button>
         </div>
       </div>
+
+      {/* Subtle top dropdown (mobile only) */}
+      {open && (
+        <>
+          {/* Invisible overlay below navbar to enable click-outside close */}
+          <button
+            type="button"
+            className="fixed inset-x-0 bottom-0 top-14 z-40 md:hidden bg-transparent"
+            aria-label="Close menu overlay"
+            onClick={() => setOpen(false)}
+          />
+          {/* Dropdown panel aligned to the right under the navbar */}
+          <div className="fixed right-4 top-14 z-50 md:hidden">
+            <div className="min-w-[12rem] rounded-lg border border-white/10 bg-[var(--background)] text-[var(--foreground)] shadow-lg backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-900/60">
+              <ul className="py-1 text-sm font-medium">
+                {links.map(l => {
+                  const active = pathname === l.href;
+                  return (
+                    <li key={l.href}>
+                      <Link
+                        href={l.href}
+                        onClick={() => setOpen(false)}
+                        ref={l.href === links[0].href ? firstFocusRef : undefined}
+                        className={`block w-full px-3 py-2 rounded-md transition ${active ? 'text-indigo-500 dark:text-indigo-400' : 'opacity-85 hover:opacity-100'} hover:text-indigo-500 dark:hover:text-indigo-300`}
+                      >
+                        {l.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   );
 }
