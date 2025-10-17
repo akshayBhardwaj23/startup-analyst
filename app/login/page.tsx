@@ -10,7 +10,16 @@ export default function LoginPage() {
           Authenticate to upload documents and generate briefs.
         </p>
         <button
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => {
+            try {
+              const url = new URL(window.location.href);
+              const appRedirect = url.searchParams.get("app_redirect") || undefined;
+              const callbackUrl = "/mobile-auth-complete" + (appRedirect ? `?app_redirect=${encodeURIComponent(appRedirect)}` : "");
+              signIn("google", { callbackUrl });
+            } catch {
+              signIn("google", { callbackUrl: "/" });
+            }
+          }}
           className="btn-primary text-sm w-full"
         >
           Continue with Google

@@ -160,7 +160,7 @@ export default function NavBar() {
                 </span>
                 <button
                   onClick={() => signOut()}
-                  className="text-[10px] px-4 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer whitespace-nowrap"
+                  className="text-[12px] px-4 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer whitespace-nowrap"
                 >
                   <span className="px-2 inline-block whitespace-nowrap">Log out</span>
                 </button>
@@ -168,9 +168,18 @@ export default function NavBar() {
             ) : (
               <button
                 type="button"
-                onClick={() => signIn("google")}
+                onClick={() => {
+                  try {
+                    const url = new URL(window.location.href);
+                    const appRedirect = url.searchParams.get("app_redirect") || undefined;
+                    const callbackUrl = "/mobile-auth-complete" + (appRedirect ? `?app_redirect=${encodeURIComponent(appRedirect)}` : "");
+                    signIn("google", { callbackUrl });
+                  } catch {
+                    signIn("google");
+                  }
+                }}
                 aria-label="Sign in"
-                className="inline-flex items-center gap-2 rounded-md border border-[#dadce0] bg-white px-4 py-1.5 text-[10px] font-medium text-[#3c4043] shadow-sm hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4] cursor-pointer whitespace-nowrap ml-1"
+                className="inline-flex items-center gap-2 rounded-md border border-[#dadce0] bg-white px-4 py-1.5 text-[12px] font-medium text-[#3c4043] shadow-sm hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4] cursor-pointer whitespace-nowrap ml-1"
               >
                 <span aria-hidden className="flex h-4 w-4 items-center justify-center">
                   <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
