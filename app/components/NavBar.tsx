@@ -162,14 +162,14 @@ export default function NavBar() {
                   onClick={() => signOut()}
                   className="text-xs px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer"
                 >
-                  Sign out
+                  Log out
                 </button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => signIn("google")}
-                aria-label="Sign in with Google"
+                aria-label="Sign in"
                 className="inline-flex items-center gap-2 rounded-md border border-[#dadce0] bg-white px-3 py-1.5 text-xs font-medium text-[#3c4043] shadow-sm hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4] cursor-pointer ml-1"
               >
                 <span aria-hidden className="flex h-4 w-4 items-center justify-center">
@@ -180,7 +180,7 @@ export default function NavBar() {
                     <path d="M9 3.54c1.322 0 2.514.455 3.45 1.348l2.587-2.587C13.465.864 11.427 0 9 0 5.481 0 2.437 2.017.957 4.949l3.006 2.332C4.671 5.153 6.656 3.54 9 3.54z" fill="#EA4335"/>
                   </svg>
                 </span>
-                <span>Sign in with Google</span>
+                <span>Sign in</span>
               </button>
             ))}
 
