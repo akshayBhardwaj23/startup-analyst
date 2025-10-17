@@ -34,8 +34,8 @@ export default function TermsPage() {
         <section className="space-y-3 text-sm">
           <h2 className="text-lg font-medium">3. Service Availability</h2>
           <p>
-            The service is provided on an "as is" and "as available" basis
-            without warranties of any kind.
+            The service is provided on an &quot;as is&quot; and &quot;as
+            available&quot; basis without warranties of any kind.
           </p>
         </section>
 
