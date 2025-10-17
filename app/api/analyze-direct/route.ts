@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gemini } from "@/lib/vertex";
-import { auth } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -53,7 +54,7 @@ async function fileToText(file: File): Promise<{ text: string; name: string }> {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
+  const session = await getServerSession(authOptions as any);
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
