@@ -742,7 +742,7 @@ export default function Home() {
                     multiple
                     accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={(e) => handleFiles(e.target.files)}
-                    disabled={analyzing || !companyName.trim()}
+                    disabled={analyzing}
                   />
                   <div className="flex flex-col items-center gap-2 text-sm">
                     <span className="font-medium">
@@ -787,11 +787,6 @@ export default function Home() {
                   className="w-full rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/60 transition"
                   aria-required
                 />
-                {!companyName.trim() && (
-                  <div className="mt-1 text-[11px] text-amber-500/90">
-                    Company name is required to proceed.
-                  </div>
-                )}
               </div>
 
               <div className="flex items-center gap-3 pt-2">
