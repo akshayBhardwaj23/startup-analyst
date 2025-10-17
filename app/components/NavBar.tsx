@@ -160,9 +160,9 @@ export default function NavBar() {
                 </span>
                 <button
                   onClick={() => signOut()}
-                  className="text-[12px] px-4 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer whitespace-nowrap"
+                  className="text-[10px] px-2 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer whitespace-nowrap"
                 >
-                  <span className="px-2 inline-block whitespace-nowrap">Log out</span>
+                  <span className="px-1 inline-block whitespace-nowrap">Log out</span>
                 </button>
               </div>
             ) : (
