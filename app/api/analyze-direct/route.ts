@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { gemini } from "@/lib/vertex";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -60,6 +61,12 @@ export async function POST(req: NextRequest) {
   }
   const form = await req.formData();
   const companyName = (form.get("companyName") as string) || "";
+  if (!companyName || !companyName.trim()) {
+    return NextResponse.json(
+      { error: "Company name is required" },
+      { status: 400 }
+    );
+  }
 
   const files: File[] = [];
   const single = form.get("file");
@@ -169,5 +176,43 @@ Documents:\n${chunks}`;
   };
   const parsed = extractJson(text) ?? { raw: text };
 
-  return NextResponse.json({ brief: parsed });
+  // Persist company + run
+  let userId = (session as any).user?.id as string | undefined;
+  if (!userId && (session as any).user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: (session as any).user.email as string },
+    });
+    userId = user?.id;
+  }
+  if (!userId) {
+    return NextResponse.json({ error: "User not found" }, { status: 500 });
+  }
+  const name = companyName.trim();
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  const company = await prisma.company.upsert({
+    where: { userId_name: { userId, name } },
+    create: { userId, name, slug },
+    update: { name, slug },
+  });
+  const run = await prisma.analysisRun.create({
+    data: {
+      userId,
+      companyId: company.id,
+      companyName: name,
+      brief: parsed as any,
+      fileNames: names as any,
+    },
+  });
+
+  const previous = await prisma.analysisRun.findMany({
+    where: { userId, companyId: company.id, id: { not: run.id } },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+    select: { id: true, createdAt: true },
+  });
+
+  return NextResponse.json({ brief: parsed, previousRuns: previous });
 }
