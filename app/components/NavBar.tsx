@@ -160,17 +160,27 @@ export default function NavBar() {
                 </span>
                 <button
                   onClick={() => signOut()}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10"
+                  className="text-xs px-3 py-1.5 rounded-lg border border-white/15 bg-white/5 hover:bg-white/10 cursor-pointer"
                 >
                   Sign out
                 </button>
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => signIn("google")}
-                className="text-xs px-3 py-1.5 rounded-lg border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 ml-1"
+                aria-label="Sign in with Google"
+                className="inline-flex items-center gap-2 rounded-md border border-[#dadce0] bg-white px-3 py-1.5 text-xs font-medium text-[#3c4043] shadow-sm hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4285F4] cursor-pointer ml-1"
               >
-                Login
+                <span aria-hidden className="flex h-4 w-4 items-center justify-center">
+                  <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.64 9.2045c0-.638-.0573-1.251-.1636-1.836H9v3.477h4.844c-.209 1.127-.842 2.082-1.795 2.724v2.26h2.908c1.702-1.568 2.683-3.877 2.683-6.625z" fill="#4285F4"/>
+                    <path d="M9 18c2.43 0 4.468-.806 5.957-2.17l-2.908-2.26c-.806.54-1.835.859-3.049.859-2.344 0-4.329-1.582-5.037-3.71H.957v2.332C2.437 15.983 5.481 18 9 18z" fill="#34A853"/>
+                    <path d="M3.963 10.719A5.41 5.41 0 0 1 3.671 9c0-.596.102-1.173.292-1.719V4.949H.957A8.992 8.992 0 0 0 0 9c0 1.46.349 2.84.957 4.051l3.006-2.332z" fill="#FBBC05"/>
+                    <path d="M9 3.54c1.322 0 2.514.455 3.45 1.348l2.587-2.587C13.465.864 11.427 0 9 0 5.481 0 2.437 2.017.957 4.949l3.006 2.332C4.671 5.153 6.656 3.54 9 3.54z" fill="#EA4335"/>
+                  </svg>
+                </span>
+                <span>Sign in with Google</span>
               </button>
             ))}
 
