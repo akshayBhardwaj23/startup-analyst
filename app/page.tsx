@@ -1,6 +1,7 @@
 "use client";
 import { useState, useCallback, useRef } from "react";
 import { upload } from "@vercel/blob/client";
+import { useSession } from "next-auth/react";
 
 type Brief = Record<string, any>;
 
@@ -16,7 +17,8 @@ function Gauge({
   emphasis?: boolean;
   scale?: number;
 }) {
-  const safe = typeof score === "number" ? Math.min(100, Math.max(0, score)) : null;
+  const safe =
+    typeof score === "number" ? Math.min(100, Math.max(0, score)) : null;
   // Dimensions (emphasis + scale)
   const baseW = emphasis ? 160 : 120;
   const baseH = emphasis ? 90 : 68;
@@ -37,13 +39,14 @@ function Gauge({
   // For smooth proportional fill, we render the value arc using stroke-dasharray
   // on the same semi-circle path with pathLength=100 (so dash = score%).
 
-  const color = safe == null
-    ? "#1b62c7ff" // slate-400
-    : safe < 40
+  const color =
+    safe == null
+      ? "#1b62c7ff" // slate-400
+      : safe < 40
       ? "#ef4444" // red-500
       : safe < 70
-        ? "#f59e0b" // amber-500
-        : "#22c55e"; // green-500
+      ? "#f59e0b" // amber-500
+      : "#22c55e"; // green-500
 
   const strokeW = emphasis ? 8 : 6;
   const fontSize = Math.round(r * (emphasis ? 0.68 : 0.58));
@@ -87,11 +90,26 @@ function Gauge({
         )}
         {/* Number inside the arc */}
         {safe != null ? (
-          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-current" fontSize={fontSize} fontWeight={700}>
+          <text
+            x={cx}
+            y={numberY}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-current"
+            fontSize={fontSize}
+            fontWeight={700}
+          >
             {Math.round(safe)}
           </text>
         ) : (
-          <text x={cx} y={numberY} textAnchor="middle" dominantBaseline="middle" className="fill-current opacity-60" fontSize={Math.max(10, fontSize - 2)}>
+          <text
+            x={cx}
+            y={numberY}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-current opacity-60"
+            fontSize={Math.max(10, fontSize - 2)}
+          >
             N/A
           </text>
         )}
@@ -104,6 +122,7 @@ function Gauge({
 }
 
 export default function Home() {
+  const { data: session } = useSession();
   const [files, setFiles] = useState<FileList | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
@@ -158,8 +177,12 @@ export default function Home() {
   const onDownloadPDF = useCallback(async () => {
     if (!brief) return;
     try {
-      const { default: jsPDF } = await import('jspdf');
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+      const { default: jsPDF } = await import("jspdf");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "pt",
+        format: "a4",
+      });
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 36; // 0.5"
@@ -174,7 +197,7 @@ export default function Home() {
       const loadImage = (src: string) =>
         new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
+          img.crossOrigin = "anonymous";
           img.onload = () => resolve(img);
           img.onerror = reject;
           img.src = src;
@@ -182,84 +205,100 @@ export default function Home() {
 
       const headerHeight = 48; // pts
       try {
-        const logo = await loadImage('/brand-icon.png');
+        const logo = await loadImage("/brand-icon.png");
         const logoSize = 28; // pts
         const logoY = margin + (headerHeight - logoSize) / 2;
-        pdf.addImage(logo as any, 'PNG', margin, logoY, logoSize, logoSize);
+        pdf.addImage(logo as any, "PNG", margin, logoY, logoSize, logoSize);
       } catch {}
 
       // Company name
       const nameX = margin + 36; // some space after logo
       const nameY = margin + 20; // first line baseline
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(14);
       pdf.setTextColor(30, 30, 30);
-      pdf.text('Startup Analyst XI', nameX, nameY);
+      pdf.text("Startup Analyst XI", nameX, nameY);
 
       // Website URL (clickable)
-      const url = 'https://startup-analyst-xi.vercel.app/';
-      pdf.setFont('helvetica', 'normal');
+      const url = "https://startup-analyst-xi.vercel.app/";
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
       pdf.setTextColor(56, 116, 203); // link-ish blue
       const urlY = nameY + 14;
       pdf.text(url, nameX, urlY);
       try {
-        const urlW = (pdf as any).getTextWidth ? (pdf as any).getTextWidth(url) : 140;
+        const urlW = (pdf as any).getTextWidth
+          ? (pdf as any).getTextWidth(url)
+          : 140;
         pdf.link(nameX, urlY - 10, urlW, 14, { url });
       } catch {}
 
       // Top-right: user-entered company name
       if (companyName && companyName.trim()) {
         const rightLabel = companyName.trim();
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(11);
         pdf.setTextColor(60, 60, 60);
         // Constrain to avoid overlapping the left header block
         const maxRightWidth = contentWidth * 0.44; // roughly the right column width
-        const getW = (t: string) => (pdf as any).getTextWidth ? (pdf as any).getTextWidth(t) : t.length * 6;
+        const getW = (t: string) =>
+          (pdf as any).getTextWidth
+            ? (pdf as any).getTextWidth(t)
+            : t.length * 6;
         let display = rightLabel;
         if (getW(display) > maxRightWidth) {
           // Truncate with ellipsis until it fits
-          while (display.length > 1 && getW(display + '…') > maxRightWidth) {
+          while (display.length > 1 && getW(display + "…") > maxRightWidth) {
             display = display.slice(0, -1);
           }
-          display += '…';
+          display += "…";
         }
         // Align to the right margin at the same baseline as company title on the left
-        pdf.text(display, pageWidth - margin, nameY, { align: 'right' as any });
+        pdf.text(display, pageWidth - margin, nameY, { align: "right" as any });
       }
 
       // Divider under header
-      (pdf as any).setLineCap && (pdf as any).setLineCap('butt');
+      (pdf as any).setLineCap && (pdf as any).setLineCap("butt");
       pdf.setDrawColor(230, 230, 235);
       pdf.setLineWidth(0.8);
-      pdf.line(margin, margin + headerHeight, pageWidth - margin, margin + headerHeight);
+      pdf.line(
+        margin,
+        margin + headerHeight,
+        pageWidth - margin,
+        margin + headerHeight
+      );
 
       let leftY = margin + headerHeight + 10;
       let rightY = margin + headerHeight + 10;
 
       const hexToRgb = (hex: string): [number, number, number] => {
-        const h = hex.replace('#', '');
+        const h = hex.replace("#", "");
         const bigint = parseInt(h, 16);
         return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
       };
-      const setStroke = (hex: string, w: number, cap: 'butt'|'round'|'square' = 'round') => {
-        const [r,g,b] = hexToRgb(hex);
+      const setStroke = (
+        hex: string,
+        w: number,
+        cap: "butt" | "round" | "square" = "round"
+      ) => {
+        const [r, g, b] = hexToRgb(hex);
         (pdf as any).setLineCap && (pdf as any).setLineCap(cap);
-        pdf.setDrawColor(r,g,b);
+        pdf.setDrawColor(r, g, b);
         pdf.setLineWidth(w);
       };
       const setFill = (hex: string) => {
-        const [r,g,b] = hexToRgb(hex);
-        pdf.setTextColor(r,g,b);
+        const [r, g, b] = hexToRgb(hex);
+        pdf.setTextColor(r, g, b);
       };
-      const textColor = (pdf as any).getTextColor ? (pdf as any).getTextColor() : undefined;
+      const textColor = (pdf as any).getTextColor
+        ? (pdf as any).getTextColor()
+        : undefined;
 
       const gaugeColorFor = (score: number | null | undefined) => {
-        if (score == null) return '#94a3b8'; // slate-400
-        if (score < 40) return '#ef4444';
-        if (score < 70) return '#f59e0b';
-        return '#22c55e';
+        if (score == null) return "#94a3b8"; // slate-400
+        if (score < 40) return "#ef4444";
+        if (score < 70) return "#f59e0b";
+        return "#22c55e";
       };
       const drawSemiGauge = (
         x: number,
@@ -269,63 +308,77 @@ export default function Home() {
         label: string,
         emphasize = false
       ) => {
-        const r = Math.min(w/2 - 4, 90);
-        const cx = x + w/2;
+        const r = Math.min(w / 2 - 4, 90);
+        const cx = x + w / 2;
         const cy = y + r + 10;
-        const trackColor = '#334155';
+        const trackColor = "#334155";
         const strokeW = emphasize ? 8 : 6;
-        const safe = typeof score === 'number' ? Math.max(0, Math.min(100, score)) : null;
+        const safe =
+          typeof score === "number" ? Math.max(0, Math.min(100, score)) : null;
         // Track
-        setStroke(trackColor, strokeW, 'butt');
+        setStroke(trackColor, strokeW, "butt");
         const segments = 60; // smoothness
-        let prevX = cx - r, prevY = cy;
-        for (let i=1;i<=segments;i++) {
-          const t = i/segments;
+        let prevX = cx - r,
+          prevY = cy;
+        for (let i = 1; i <= segments; i++) {
+          const t = i / segments;
           const ang = Math.PI * (1 - t); // pi -> 0
           const px = cx + Math.cos(ang) * r;
           const py = cy - Math.sin(ang) * r;
           pdf.line(prevX, prevY, px, py);
-          prevX = px; prevY = py;
+          prevX = px;
+          prevY = py;
         }
         // Value arc
         if (safe != null && safe > 0) {
           const color = gaugeColorFor(safe);
-          setStroke(color, strokeW, 'round');
+          setStroke(color, strokeW, "round");
           const filledSeg = Math.max(1, Math.round((segments * safe) / 100));
-          prevX = cx - r; prevY = cy;
-          for (let i=1;i<=filledSeg;i++) {
-            const t = i/segments;
+          prevX = cx - r;
+          prevY = cy;
+          for (let i = 1; i <= filledSeg; i++) {
+            const t = i / segments;
             const ang = Math.PI * (1 - t);
             const px = cx + Math.cos(ang) * r;
             const py = cy - Math.sin(ang) * r;
             pdf.line(prevX, prevY, px, py);
-            prevX = px; prevY = py;
+            prevX = px;
+            prevY = py;
           }
         }
         // Number
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont("helvetica", "bold");
         const fs = emphasize ? 28 : 20;
         pdf.setFontSize(fs);
-        pdf.setTextColor(30,30,30);
-        pdf.text(String(safe == null ? 'N/A' : Math.round(safe)), cx, cy - r*0.2, { align: 'center' as any });
+        pdf.setTextColor(30, 30, 30);
+        pdf.text(
+          String(safe == null ? "N/A" : Math.round(safe)),
+          cx,
+          cy - r * 0.2,
+          { align: "center" as any }
+        );
         // Label
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
-        pdf.setTextColor(60,60,60);
-        pdf.text(label.toUpperCase(), cx, cy + 18, { align: 'center' as any });
+        pdf.setTextColor(60, 60, 60);
+        pdf.text(label.toUpperCase(), cx, cy + 18, { align: "center" as any });
         // return height consumed
-        return (r + 24) + 10; // arc height + label + padding
+        return r + 24 + 10; // arc height + label + padding
       };
 
       const addHeading = (text: string) => {
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(11);
-        pdf.setTextColor(99,102,241); // indigo-ish
+        pdf.setTextColor(99, 102, 241); // indigo-ish
         pdf.text(text.toUpperCase(), rightX, rightY);
         rightY += 14;
       };
-      const addParagraph = (text: string, maxW: number, color: [number,number,number] = [34,34,34]) => {
-        pdf.setFont('helvetica', 'normal');
+      const addParagraph = (
+        text: string,
+        maxW: number,
+        color: [number, number, number] = [34, 34, 34]
+      ) => {
+        pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
         const lines = pdf.splitTextToSize(text, maxW);
         pdf.setTextColor(...color);
@@ -338,59 +391,94 @@ export default function Home() {
         rightY += 6;
       };
       const toLinesStr = (value: any): string => {
-        if (Array.isArray(value)) return value.map(v => typeof v === 'object' ? (v.text ?? JSON.stringify(v)) : String(v)).join('\n');
-        if (value && typeof value === 'object') return String((value as any).text ?? JSON.stringify(value, null, 2));
-        if (value == null) return '';
+        if (Array.isArray(value))
+          return value
+            .map((v) =>
+              typeof v === "object" ? v.text ?? JSON.stringify(v) : String(v)
+            )
+            .join("\n");
+        if (value && typeof value === "object")
+          return String((value as any).text ?? JSON.stringify(value, null, 2));
+        if (value == null) return "";
         return String(value);
       };
 
       // Left column: Overall big gauge, then other gauges
       const ratings: any = (brief as any).ratings || {};
-      const order = ['overall','team_strength','market_quality','product_maturity','moat','traction','risk_profile','data_confidence'];
+      const order = [
+        "overall",
+        "team_strength",
+        "market_quality",
+        "product_maturity",
+        "moat",
+        "traction",
+        "risk_profile",
+        "data_confidence",
+      ];
       const items = order
-        .map(k => ({ key: k, label: (
-          k === 'overall' ? 'Overall' :
-          k === 'team_strength' ? 'Team Strength' :
-          k === 'market_quality' ? 'Market Quality' :
-          k === 'product_maturity' ? 'Product Maturity' :
-          k === 'risk_profile' ? 'Risk Profile' :
-          k === 'data_confidence' ? 'Data Confidence' :
-          k.charAt(0).toUpperCase() + k.slice(1).replace('_',' ')
-        ), score: ratings?.[k]?.score as number | undefined }))
-        .filter(e => typeof e.score === 'number' && (e.score as number) > 0);
+        .map((k) => ({
+          key: k,
+          label:
+            k === "overall"
+              ? "Overall"
+              : k === "team_strength"
+              ? "Team Strength"
+              : k === "market_quality"
+              ? "Market Quality"
+              : k === "product_maturity"
+              ? "Product Maturity"
+              : k === "risk_profile"
+              ? "Risk Profile"
+              : k === "data_confidence"
+              ? "Data Confidence"
+              : k.charAt(0).toUpperCase() + k.slice(1).replace("_", " "),
+          score: ratings?.[k]?.score as number | undefined,
+        }))
+        .filter((e) => typeof e.score === "number" && (e.score as number) > 0);
 
-      const overall = items.find(i => i.key === 'overall');
-      const others = items.filter(i => i.key !== 'overall');
+      const overall = items.find((i) => i.key === "overall");
+      const others = items.filter((i) => i.key !== "overall");
 
       if (overall) {
         // Big overall gauge
-        const consumed = drawSemiGauge(leftX, leftY, leftW, overall.score, 'Overall', true);
+        const consumed = drawSemiGauge(
+          leftX,
+          leftY,
+          leftW,
+          overall.score,
+          "Overall",
+          true
+        );
         leftY += consumed + 8;
       }
       if (others.length > 0) {
         // Render others in 3 columns grid of small gauges
         const cols = 3;
         const gap = 8;
-        const cellW = Math.floor((leftW - gap*(cols-1)) / cols);
-        let col = 0; let row = 0;
+        const cellW = Math.floor((leftW - gap * (cols - 1)) / cols);
+        let col = 0;
+        let row = 0;
         const baseY = leftY;
-        for (let i=0;i<others.length;i++) {
+        for (let i = 0; i < others.length; i++) {
           const e = others[i];
-          const gx = leftX + col*(cellW + gap);
-          const gy = baseY + row*90; // approx row height for small gauges
+          const gx = leftX + col * (cellW + gap);
+          const gy = baseY + row * 90; // approx row height for small gauges
           drawSemiGauge(gx, gy, cellW, e.score, e.label, false);
           col++;
-          if (col >= cols) { col = 0; row++; }
+          if (col >= cols) {
+            col = 0;
+            row++;
+          }
         }
         // advance leftY to the bottom of the last row of gauges
         const rowsUsed = row + (col > 0 ? 1 : 0);
-        leftY = baseY + rowsUsed*90 + 10;
+        leftY = baseY + rowsUsed * 90 + 10;
       }
 
       // Right column: one-liner then sections
       const oneLiner = toLinesStr((brief as any).one_liner);
       if (oneLiner) {
-        pdf.setFont('helvetica', 'bold');
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(13);
         pdf.setTextColor(80, 39, 201);
         const lines = pdf.splitTextToSize(oneLiner, rightW);
@@ -405,24 +493,24 @@ export default function Home() {
 
       // Build formatted sections with better handling for nested objects/lists
       const formatICPGTM = (obj: any): string => {
-        if (!obj || typeof obj !== 'object') return toLinesStr(obj);
+        if (!obj || typeof obj !== "object") return toLinesStr(obj);
         const parts: string[] = [];
         if (obj.icp) {
           const icpText = toLinesStr(obj.icp);
-          if (icpText) parts.push('ICP: ' + icpText);
+          if (icpText) parts.push("ICP: " + icpText);
         }
         if (obj.gtm) {
           const gtmText = toLinesStr(obj.gtm);
-          if (gtmText) parts.push('GTM: ' + gtmText);
+          if (gtmText) parts.push("GTM: " + gtmText);
         }
-        return parts.join('\n\n');
+        return parts.join("\n\n");
       };
       const formatTAM = (obj: any): string => {
-        if (!obj || typeof obj !== 'object') return toLinesStr(obj);
-        const map: Record<string,string> = {
-          global_market: 'Global Market',
-          target_segment: 'Target Segment',
-          growth: 'Growth'
+        if (!obj || typeof obj !== "object") return toLinesStr(obj);
+        const map: Record<string, string> = {
+          global_market: "Global Market",
+          target_segment: "Target Segment",
+          growth: "Growth",
         };
         const parts: string[] = [];
         for (const key of Object.keys(map)) {
@@ -431,75 +519,85 @@ export default function Home() {
           const txt = toLinesStr(node);
           if (txt) parts.push(`${map[key]}: ${txt}`);
         }
-        return parts.join('\n\n');
+        return parts.join("\n\n");
       };
       const formatList = (arr: any): string => {
         if (!Array.isArray(arr)) return toLinesStr(arr);
-        return arr.map((v: any) => '• ' + (typeof v === 'object' ? (v.text ?? JSON.stringify(v)) : String(v))).join('\n');
+        return arr
+          .map(
+            (v: any) =>
+              "• " +
+              (typeof v === "object" ? v.text ?? JSON.stringify(v) : String(v))
+          )
+          .join("\n");
       };
 
       type Section = { title: string; text: string };
       const sections: Section[] = [];
-      const pushIf = (title: string, text: string) => { if (text && text.trim()) sections.push({ title, text: text.trim() }); };
-      pushIf('Problem', toLinesStr((brief as any).problem));
-      pushIf('Solution', toLinesStr((brief as any).solution));
-      pushIf('ICP & GTM', formatICPGTM((brief as any).icp_gtm));
-      pushIf('Traction', formatList((brief as any).traction_bullets));
-      pushIf('Business Model', toLinesStr((brief as any).business_model));
-      pushIf('TAM', formatTAM((brief as any).tam));
-      pushIf('Team', toLinesStr((brief as any).team));
-      pushIf('Moat', formatList((brief as any).moat_bullets));
-      pushIf('Risks', formatList((brief as any).risks_bullets));
+      const pushIf = (title: string, text: string) => {
+        if (text && text.trim()) sections.push({ title, text: text.trim() });
+      };
+      pushIf("Problem", toLinesStr((brief as any).problem));
+      pushIf("Solution", toLinesStr((brief as any).solution));
+      pushIf("ICP & GTM", formatICPGTM((brief as any).icp_gtm));
+      pushIf("Traction", formatList((brief as any).traction_bullets));
+      pushIf("Business Model", toLinesStr((brief as any).business_model));
+      pushIf("TAM", formatTAM((brief as any).tam));
+      pushIf("Team", toLinesStr((brief as any).team));
+      pushIf("Moat", formatList((brief as any).moat_bullets));
+      pushIf("Risks", formatList((brief as any).risks_bullets));
 
       const maxY = pageHeight - margin;
       const writeSection = (s: Section) => {
         // Heading: prefer right column; if no space there, try left below gauges
-        const writeHeadingTo = (x: number, yRef: 'right'|'left') => {
-          pdf.setFont('helvetica', 'bold');
+        const writeHeadingTo = (x: number, yRef: "right" | "left") => {
+          pdf.setFont("helvetica", "bold");
           pdf.setFontSize(11);
-          pdf.setTextColor(99,102,241);
-          const y = yRef === 'right' ? rightY : leftY;
+          pdf.setTextColor(99, 102, 241);
+          const y = yRef === "right" ? rightY : leftY;
           pdf.text(s.title.toUpperCase(), x, y);
-          if (yRef === 'right') rightY += 14; else leftY += 14;
+          if (yRef === "right") rightY += 14;
+          else leftY += 14;
         };
-        const writeParaTo = (x: number, w: number, yRef: 'right'|'left') => {
+        const writeParaTo = (x: number, w: number, yRef: "right" | "left") => {
           const lines = pdf.splitTextToSize(s.text, w);
-          pdf.setFont('helvetica', 'normal');
+          pdf.setFont("helvetica", "normal");
           pdf.setFontSize(10);
-          pdf.setTextColor(34,34,34);
+          pdf.setTextColor(34, 34, 34);
           const lineH = 13;
-          let y = yRef === 'right' ? rightY : leftY;
+          let y = yRef === "right" ? rightY : leftY;
           for (const ln of lines) {
             if (y >= maxY) return false; // full
             pdf.text(ln, x, y);
             y += lineH;
           }
-          if (yRef === 'right') rightY = y + 6; else leftY = y + 6;
+          if (yRef === "right") rightY = y + 6;
+          else leftY = y + 6;
           return true;
         };
 
         // Try right column first
         if (rightY + 26 < maxY) {
-          writeHeadingTo(rightX, 'right');
-          if (!writeParaTo(rightX, rightW, 'right')) {
+          writeHeadingTo(rightX, "right");
+          if (!writeParaTo(rightX, rightW, "right")) {
             // Continue on left if space
             if (leftY + 26 < maxY) {
-              writeHeadingTo(leftX, 'left');
-              writeParaTo(leftX, leftW, 'left');
+              writeHeadingTo(leftX, "left");
+              writeParaTo(leftX, leftW, "left");
             }
           }
         } else if (leftY + 26 < maxY) {
-          writeHeadingTo(leftX, 'left');
-          writeParaTo(leftX, leftW, 'left');
+          writeHeadingTo(leftX, "left");
+          writeParaTo(leftX, leftW, "left");
         }
       };
 
       sections.forEach(writeSection);
 
-      pdf.save(`${companyName ? companyName + '-' : ''}vc-summary.pdf`);
+      pdf.save(`${companyName ? companyName + "-" : ""}vc-summary.pdf`);
     } catch (e) {
-      console.error('PDF export failed', e);
-      setError('Failed to generate PDF');
+      console.error("PDF export failed", e);
+      setError("Failed to generate PDF");
     }
   }, [brief, companyName]);
 
@@ -522,6 +620,10 @@ export default function Home() {
   }, []);
 
   const onAnalyze = async () => {
+    if (!session) {
+      window.location.href = "/login";
+      return;
+    }
     try {
       setError(null);
       setAnalyzing(true);
@@ -597,7 +699,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
-  <div className="max-w-screen-2xl mx-auto">
+      <div className="max-w-screen-2xl mx-auto">
         <header className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">
@@ -611,7 +713,9 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2">
             <div className="pulse-dot" />
-            <span className="text-xs font-medium opacity-70">General Release</span>
+            <span className="text-xs font-medium opacity-70">
+              General Release
+            </span>
           </div>
         </header>
 
@@ -685,6 +789,7 @@ export default function Home() {
                   onClick={onAnalyze}
                   disabled={analyzing || !files || files.length === 0}
                   className="btn-primary text-sm"
+                  title={!session ? "Login to generate brief" : undefined}
                 >
                   {analyzing ? (
                     <span className="flex items-center gap-2">
@@ -693,7 +798,9 @@ export default function Home() {
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
-                      <span>Generate Brief</span>
+                      <span>
+                        {session ? "Generate Brief" : "Login to Generate"}
+                      </span>
                     </span>
                   )}
                 </button>
@@ -706,7 +813,10 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="panel glass brief flex flex-col min-h-[420px] relative md:col-span-3" ref={outRef}>
+          <section
+            className="panel glass brief flex flex-col min-h-[420px] relative md:col-span-3"
+            ref={outRef}
+          >
             <div className="flex items-start justify-between gap-4 mb-2">
               <div>
                 <div className="card-title">Output</div>
@@ -722,7 +832,17 @@ export default function Home() {
                     disabled={analyzing}
                     title="Download PDF"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                       <polyline points="7 10 12 15 17 10" />
                       <line x1="12" x2="12" y1="15" y2="3" />
@@ -778,40 +898,99 @@ export default function Home() {
 
                             // Build present entries in preferred order
                             const entries = [
-                              { key: 'overall', label: 'Overall', score: r.overall?.score as number | undefined, emphasis: true },
-                              { key: 'team_strength', label: 'Team Strength', score: r.team_strength?.score as number | undefined },
-                              { key: 'market_quality', label: 'Market Quality', score: r.market_quality?.score as number | undefined },
-                              { key: 'product_maturity', label: 'Product Maturity', score: r.product_maturity?.score as number | undefined },
-                              { key: 'moat', label: 'Moat', score: r.moat?.score as number | undefined },
-                              { key: 'traction', label: 'Traction', score: r.traction?.score as number | undefined },
-                              { key: 'risk_profile', label: 'Risk Profile', score: r.risk_profile?.score as number | undefined },
-                              { key: 'data_confidence', label: 'Data Confidence', score: r.data_confidence?.score as number | undefined },
-                            ].filter((e) => typeof e.score === 'number' && (e.score as number) > 0) as Array<{ key: string; label: string; score: number; emphasis?: boolean }>;
+                              {
+                                key: "overall",
+                                label: "Overall",
+                                score: r.overall?.score as number | undefined,
+                                emphasis: true,
+                              },
+                              {
+                                key: "team_strength",
+                                label: "Team Strength",
+                                score: r.team_strength?.score as
+                                  | number
+                                  | undefined,
+                              },
+                              {
+                                key: "market_quality",
+                                label: "Market Quality",
+                                score: r.market_quality?.score as
+                                  | number
+                                  | undefined,
+                              },
+                              {
+                                key: "product_maturity",
+                                label: "Product Maturity",
+                                score: r.product_maturity?.score as
+                                  | number
+                                  | undefined,
+                              },
+                              {
+                                key: "moat",
+                                label: "Moat",
+                                score: r.moat?.score as number | undefined,
+                              },
+                              {
+                                key: "traction",
+                                label: "Traction",
+                                score: r.traction?.score as number | undefined,
+                              },
+                              {
+                                key: "risk_profile",
+                                label: "Risk Profile",
+                                score: r.risk_profile?.score as
+                                  | number
+                                  | undefined,
+                              },
+                              {
+                                key: "data_confidence",
+                                label: "Data Confidence",
+                                score: r.data_confidence?.score as
+                                  | number
+                                  | undefined,
+                              },
+                            ].filter(
+                              (e) =>
+                                typeof e.score === "number" &&
+                                (e.score as number) > 0
+                            ) as Array<{
+                              key: string;
+                              label: string;
+                              score: number;
+                              emphasis?: boolean;
+                            }>;
 
                             if (entries.length === 0) return null;
 
-                            const hasOverall = entries.some((e) => e.key === 'overall');
-                            const overall = hasOverall ? entries.find((e) => e.key === 'overall')! : null;
-                            const rest = hasOverall ? entries.filter((e) => e.key !== 'overall') : entries;
-                            const all = hasOverall && overall ? [overall, ...rest] : rest;
+                            const hasOverall = entries.some(
+                              (e) => e.key === "overall"
+                            );
+                            const overall = hasOverall
+                              ? entries.find((e) => e.key === "overall")!
+                              : null;
+                            const rest = hasOverall
+                              ? entries.filter((e) => e.key !== "overall")
+                              : entries;
+                            const all =
+                              hasOverall && overall ? [overall, ...rest] : rest;
 
                             // Helper to choose md:grid-cols-* class from count (keep strings literal for Tailwind JIT)
                             const mdColsAll = (n: number) =>
                               n <= 1
-                                ? 'md:grid-cols-1'
+                                ? "md:grid-cols-1"
                                 : n === 2
-                                ? 'md:grid-cols-2'
+                                ? "md:grid-cols-2"
                                 : n === 3
-                                ? 'md:grid-cols-3'
+                                ? "md:grid-cols-3"
                                 : n === 4
-                                ? 'md:grid-cols-4'
+                                ? "md:grid-cols-4"
                                 : n === 5
-                                ? 'md:grid-cols-5'
+                                ? "md:grid-cols-5"
                                 : n === 6
-                                ? 'md:grid-cols-6'
+                                ? "md:grid-cols-6"
                                 : n === 7
-                                ? 'md:grid-cols-7'
-                                : 'md:grid-cols-8';
+                                ? "md:grid-cols-7"
+                                : "md:grid-cols-8";
 
                             const overallScale = hasOverall ? 1.1 : 1; // slight emphasis
                             const itemScale = 1;
@@ -819,14 +998,24 @@ export default function Home() {
                             return (
                               <>
                                 {/* Desktop: all gauges in one row */}
-                                <div className={`hidden md:grid ${mdColsAll(all.length)} gap-3`}>
+                                <div
+                                  className={`hidden md:grid ${mdColsAll(
+                                    all.length
+                                  )} gap-3`}
+                                >
                                   {all.map((e) => (
                                     <Gauge
                                       key={e.key}
                                       label={e.label}
                                       score={e.score}
-                                      emphasis={hasOverall && e.key === 'overall'}
-                                      scale={hasOverall && e.key === 'overall' ? overallScale : itemScale}
+                                      emphasis={
+                                        hasOverall && e.key === "overall"
+                                      }
+                                      scale={
+                                        hasOverall && e.key === "overall"
+                                          ? overallScale
+                                          : itemScale
+                                      }
                                     />
                                   ))}
                                 </div>
@@ -835,12 +1024,22 @@ export default function Home() {
                                 {hasOverall ? (
                                   <>
                                     <div className="grid grid-cols-1 gap-3 md:hidden">
-                                      <Gauge label="Overall" score={overall!.score} emphasis scale={overallScale} />
+                                      <Gauge
+                                        label="Overall"
+                                        score={overall!.score}
+                                        emphasis
+                                        scale={overallScale}
+                                      />
                                     </div>
                                     {rest.length > 0 && (
                                       <div className="grid grid-cols-2 gap-3 md:hidden">
                                         {rest.map((e) => (
-                                          <Gauge key={e.key} label={e.label} score={e.score} scale={itemScale} />
+                                          <Gauge
+                                            key={e.key}
+                                            label={e.label}
+                                            score={e.score}
+                                            scale={itemScale}
+                                          />
                                         ))}
                                       </div>
                                     )}
@@ -849,7 +1048,12 @@ export default function Home() {
                                   // No Overall: just 2-per-row on mobile
                                   <div className="grid grid-cols-2 gap-3 md:hidden">
                                     {all.map((e) => (
-                                      <Gauge key={e.key} label={e.label} score={e.score} scale={itemScale} />
+                                      <Gauge
+                                        key={e.key}
+                                        label={e.label}
+                                        score={e.score}
+                                        scale={itemScale}
+                                      />
                                     ))}
                                   </div>
                                 )}

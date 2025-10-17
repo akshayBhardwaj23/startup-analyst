@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gemini } from "@/lib/vertex";
 import { chunkText } from "@/lib/chunk";
+import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -48,6 +49,10 @@ async function parseDocx(buffer: Buffer): Promise<string> {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const body = await req.json().catch(() => null);
   if (!body)
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });

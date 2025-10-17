@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gemini } from "@/lib/vertex";
+import { auth } from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -8,20 +9,25 @@ async function parsePdf(buffer: Buffer): Promise<string> {
   // Strategy: try normal parse -> then try passing object with data buffer
   let firstErr: any = null;
   try {
-    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default as any;
+    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js"))
+      .default as any;
     const res = await pdfParse(buffer);
     if (res?.text) return String(res.text);
   } catch (e: any) {
     firstErr = e;
   }
   try {
-    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js")).default as any;
+    const pdfParse = (await import("pdf-parse/lib/pdf-parse.js"))
+      .default as any;
     const res = await pdfParse({ data: buffer });
     if (res?.text) return String(res.text);
   } catch (e) {
     if (!firstErr) firstErr = e;
   }
-  console.warn("pdf parse failed (all strategies)", firstErr?.message || firstErr);
+  console.warn(
+    "pdf parse failed (all strategies)",
+    firstErr?.message || firstErr
+  );
   return "";
 }
 
@@ -47,6 +53,10 @@ async function fileToText(file: File): Promise<{ text: string; name: string }> {
 }
 
 export async function POST(req: NextRequest) {
+  const session = await auth();
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const form = await req.formData();
   const companyName = (form.get("companyName") as string) || "";
 
@@ -126,7 +136,7 @@ Rules:
 - Always include every top-level key even if text is empty.
 - Output must be pure JSON with no leading or trailing characters.
 
-Company: ${companyName || 'Unknown'}
+Company: ${companyName || "Unknown"}
 
 Documents:\n${chunks}`;
 
