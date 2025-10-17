@@ -5,13 +5,14 @@ import { prisma } from "@/lib/prisma";
 export default async function CompanyHistoryPage({
   params,
 }: {
-  params: { companyId: string };
+  params: Promise<{ companyId: string }>;
 }) {
+  const { companyId } = await params;
   const session = (await getServerSession(authOptions as any)) as any;
   if (!session?.user) return null;
   const userId = session.user.id as string;
   const company = await prisma.company.findFirst({
-    where: { id: params.companyId, userId },
+    where: { id: companyId, userId },
   });
   if (!company) return null;
   const runs = await prisma.analysisRun.findMany({
@@ -25,7 +26,7 @@ export default async function CompanyHistoryPage({
           {company.name} – Previous Analyses
         </h1>
         <div className="space-y-3">
-          {runs.map((r) => (
+          {runs.map((r: { id: string; createdAt: Date; brief: unknown }) => (
             <details
               key={r.id}
               className="rounded-md border border-white/10 bg-white/5"
