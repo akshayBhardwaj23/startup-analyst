@@ -265,7 +265,7 @@ export default function NavBar() {
           />
           {/* Dropdown panel aligned to the right under the navbar */}
           <div className="fixed right-4 top-14 z-50 md:hidden">
-            <div className="min-w-[12rem] rounded-lg border border-white/10 bg-[var(--background)] text-[var(--foreground)] shadow-lg backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-zinc-900/60">
+            <div className="min-w-[12rem] rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-black text-black dark:text-white shadow-lg">
               <ul className="py-1 text-sm font-medium">
                 {links.map((l) => {
                   const active = pathname === l.href;
