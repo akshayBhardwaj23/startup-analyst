@@ -787,6 +787,9 @@ export default function Home() {
                   className="w-full rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/60 transition"
                   aria-required
                 />
+                <div className="mt-1 text-[11px] opacity-70">
+                  Company name is required to generate the brief.
+                </div>
               </div>
 
               <div className="flex items-center gap-3 pt-2">
