@@ -25,7 +25,7 @@ export default async function HistoryPage() {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-semibold tracking-tight mb-6">History</h1>
         <ul className="space-y-3">
-          {companies.map((c) => (
+          {companies.map((c: any) => (
             <li
               key={c.id}
               className="rounded-md border border-white/10 p-3 bg-white/5"
