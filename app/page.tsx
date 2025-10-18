@@ -123,7 +123,7 @@ function Gauge({
 
 export default function Home() {
   const { data: session } = useSession();
-  const [files, setFiles] = useState<FileList | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [companyName, setCompanyName] = useState("");
   const [analyzing, setAnalyzing] = useState(false);
   const [brief, setBrief] = useState<Brief | null>(null);
@@ -620,7 +620,8 @@ export default function Home() {
 
   const handleFiles = useCallback((list: FileList | null) => {
     if (!list || list.length === 0) return;
-    setFiles(list);
+    const next: File[] = Array.from(list);
+    setFiles((prev) => [...prev, ...next]);
     setError(null);
   }, []);
 
@@ -637,7 +638,7 @@ export default function Home() {
       setError(null);
       setAnalyzing(true);
       setBrief(null);
-      if (!files || files.length === 0) throw new Error("Upload files first");
+      if (files.length === 0) throw new Error("Upload files first");
 
       // 1) Upload files to Vercel Blob via client SDK (streams, avoids body size limits)
       const uploadedUrls: string[] = [];
@@ -677,10 +678,10 @@ export default function Home() {
     }
   };
 
-  const totalFiles = files?.length || 0;
-  const fileNames: string[] = [];
-  if (files)
-    for (let i = 0; i < files.length; i++) fileNames.push(files[i].name);
+  const totalFiles = files.length;
+  const removeFileAt = (idx: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
 
   const onCopy = async () => {
     try {
@@ -770,15 +771,37 @@ export default function Home() {
                 </div>
                 {totalFiles > 0 && (
                   <ul className="mt-4 space-y-1 max-h-40 overflow-auto pr-1 text-xs">
-                    {fileNames.map((f) => (
+                    {files.map((file, idx) => (
                       <li
-                        key={f}
+                        key={`${file.name}-${idx}`}
                         className="flex items-center gap-2 py-1 px-2 rounded-md bg-indigo-500/5 border border-indigo-500/10"
                       >
                         <span className="i-tabler-file-description text-indigo-400" />
-                        <span className="truncate flex-1" title={f}>
-                          {f}
+                        <span className="truncate flex-1" title={file.name}>
+                          {file.name}
                         </span>
+                        <button
+                          onClick={() => removeFileAt(idx)}
+                          className="ml-2 inline-flex items-center justify-center h-6 w-6 rounded hover:bg-white/10 text-red-400"
+                          aria-label={`Remove ${file.name}`}
+                          title="Remove file"
+                        >
+                          {/* X icon */}
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            width="16"
+                            height="16"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </button>
                       </li>
                     ))}
                   </ul>
