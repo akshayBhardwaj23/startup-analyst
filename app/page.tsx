@@ -129,6 +129,11 @@ export default function Home() {
   const [brief, setBrief] = useState<Brief | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [previousRuns, setPreviousRuns] = useState<Array<{
+    id: string;
+    createdAt: string;
+    brief: any;
+  }> | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
   const outRef = useRef<HTMLDivElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -662,6 +667,9 @@ export default function Home() {
         ? await res.json()
         : { brief: { raw: await res.text() } };
       setBrief(data.brief);
+      setPreviousRuns(
+        Array.isArray(data.previousRuns) ? data.previousRuns : null
+      );
     } catch (e: any) {
       setError(e.message || "Analyze failed");
     } finally {
@@ -1253,6 +1261,31 @@ export default function Home() {
                       ))}
                     </div>
                   )}
+                </div>
+              )}
+              {/* Previous analyses accordion */}
+              {previousRuns && previousRuns.length > 0 && (
+                <div className="mt-6 space-y-2">
+                  <div className="text-[10px] uppercase font-semibold tracking-wider text-indigo-300/70">
+                    Previous analyses
+                  </div>
+                  <div className="space-y-2">
+                    {previousRuns.map((r) => (
+                      <details
+                        key={r.id}
+                        className="rounded-md border border-white/10 bg-white/5"
+                      >
+                        <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
+                          {new Date(r.createdAt).toLocaleString()}
+                        </summary>
+                        <div className="p-3 text-sm overflow-auto">
+                          <pre className="whitespace-pre-wrap text-xs opacity-90">
+                            {JSON.stringify(r.brief, null, 2)}
+                          </pre>
+                        </div>
+                      </details>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
