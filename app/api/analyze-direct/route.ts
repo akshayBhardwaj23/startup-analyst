@@ -211,7 +211,7 @@ Documents:\n${chunks}`;
     where: { userId, companyId: company.id, id: { not: run.id } },
     orderBy: { createdAt: "desc" },
     take: 5,
-    select: { id: true, createdAt: true },
+    select: { id: true, createdAt: true, brief: true },
   });
 
   return NextResponse.json({ brief: parsed, previousRuns: previous });
