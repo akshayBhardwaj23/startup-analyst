@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 import { useSession } from "next-auth/react";
 
@@ -129,6 +129,8 @@ export default function Home() {
   const [brief, setBrief] = useState<Brief | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [webSearch, setWebSearch] = useState<any | null>(null);
+  const [webLoading, setWebLoading] = useState(false);
   const [previousRuns, setPreviousRuns] = useState<Array<{
     id: string;
     createdAt: string;
@@ -637,7 +639,8 @@ export default function Home() {
     try {
       setError(null);
       setAnalyzing(true);
-      setBrief(null);
+  setBrief(null);
+  setWebSearch(null);
       if (files.length === 0) throw new Error("Upload files first");
 
       // 1) Upload files to Vercel Blob via client SDK (streams, avoids body size limits)
@@ -677,6 +680,31 @@ export default function Home() {
       setAnalyzing(false);
     }
   };
+
+  // When brief is ready and we have companyName, fetch web-search summary via Gemini Flash-Lite
+  useEffect(() => {
+    const run = async () => {
+      if (!brief || !companyName || !companyName.trim()) return;
+      try {
+        setWebLoading(true);
+        const res = await fetch("/api/web-search", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ companyName: companyName.trim() }),
+        });
+        const ct = res.headers.get("content-type") || "";
+        if (!res.ok) throw new Error(await res.text());
+        const payload = ct.includes("application/json") ? await res.json() : {};
+        setWebSearch(payload?.web ?? {});
+      } catch (e) {
+        setWebSearch({});
+      } finally {
+        setWebLoading(false);
+      }
+    };
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brief]);
 
   const totalFiles = files.length;
   const removeFileAt = (idx: number) => {
@@ -1119,6 +1147,8 @@ export default function Home() {
                         {[
                           { key: "problem", label: "Problem" },
                           { key: "solution", label: "Solution" },
+                          // Inject web-search block right after ICP & GTM
+                          { key: "__web_between__", label: "__web_between__" as any },
                           {
                             key: "icp_gtm",
                             label: "ICP & GTM",
@@ -1148,9 +1178,75 @@ export default function Home() {
                             label: "Founder Questions",
                           },
                         ].map((section) => {
+                          // Special pseudo-section to inject online web summary block
+                          if (section.key === "__web_between__") {
+                            const emptyJson =
+                              !webSearch ||
+                              (typeof webSearch === "object" &&
+                                Object.keys(webSearch).length === 0);
+                            return (
+                              <div key="web-summary-block">
+                                <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">
+                                  <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-300/80 mb-1 flex items-center gap-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                                    Online Summary & Market Growth
+                                  </div>
+                                  {webLoading ? (
+                                    <div className="text-[11px] opacity-70 flex items-center gap-2">
+                                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
+                                      Fetching latest web signals…
+                                    </div>
+                                  ) : emptyJson ? (
+                                    <div className="text-[11px] opacity-80">
+                                      Data isn't available online for these columns
+                                    </div>
+                                  ) : (
+                                    <div className="grid gap-2">
+                                      {/* Latest online updates */}
+                                      <div className="rounded border border-emerald-500/30 p-2">
+                                        <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">Latest Online Updates</div>
+                                        {Array.isArray(webSearch?.latest_online_updates) && webSearch.latest_online_updates.length > 0 ? (
+                                          <ul className="list-disc pl-4 space-y-1 marker:text-emerald-400/80">
+                                            {webSearch.latest_online_updates.map((u: any, i: number) => (
+                                              <li key={i} className="text-[11px]">
+                                                <span className="opacity-90">{u?.summary || ""}</span>{" "}
+                                                {u?.source && (
+                                                  <a href={u.source} target="_blank" rel="noopener noreferrer" className="text-emerald-300/90 hover:underline">
+                                                    🔗
+                                                  </a>
+                                                )}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : (
+                                          <div className="text-[11px] opacity-70">Data isn't available online</div>
+                                        )}
+                                      </div>
+                                      {/* Market growth */}
+                                      <div className="rounded border border-emerald-500/30 p-2">
+                                        <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">Market Growth</div>
+                                        {webSearch?.market_growth?.summary ? (
+                                          <div className="text-[11px]">
+                                            <span className="opacity-90">{webSearch.market_growth.summary}</span>{" "}
+                                            {webSearch?.market_growth?.source && (
+                                              <a href={webSearch.market_growth.source} target="_blank" rel="noopener noreferrer" className="text-emerald-300/90 hover:underline">
+                                                🔗
+                                              </a>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <div className="text-[11px] opacity-70">Data isn't available online</div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          }
+
                           const val: any = (brief as any)[section.key];
-                          if (!val || (Array.isArray(val) && val.length === 0))
-                            return null;
+                          if (!val || (Array.isArray(val) && val.length === 0)) return null;
                           const renderVal = () => {
                             // Nested object special cases (icp_gtm, tam)
                             if (
