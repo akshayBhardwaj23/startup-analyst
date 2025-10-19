@@ -1141,13 +1141,13 @@ export default function Home() {
                         {[
                           { key: "problem", label: "Problem" },
                           { key: "solution", label: "Solution" },
-                          // Inject web-search block right after ICP & GTM
-                          { key: "__web_between__", label: "__web_between__" as any },
                           {
                             key: "icp_gtm",
                             label: "ICP & GTM",
                             nested: ["icp", "gtm"],
                           },
+                          // Inject web-search block between ICP & GTM and Traction
+                          { key: "__web_between__", label: "__web_between__" as any },
                           { key: "traction_bullets", label: "Traction" },
                           { key: "business_model", label: "Business Model" },
                           {
@@ -1192,7 +1192,7 @@ export default function Home() {
                                     </div>
                                   ) : emptyJson ? (
                                     <div className="text-[11px] opacity-80">
-                                      Data isn't available online for these columns
+                                      Data isn&apos;t available online for these columns
                                     </div>
                                   ) : (
                                     <div className="grid gap-2">
@@ -1213,7 +1213,7 @@ export default function Home() {
                                             ))}
                                           </ul>
                                         ) : (
-                                          <div className="text-[11px] opacity-70">Data isn't available online</div>
+                                          <div className="text-[11px] opacity-70">Data isn&apos;t available online</div>
                                         )}
                                       </div>
                                       {/* Market growth */}
@@ -1229,7 +1229,7 @@ export default function Home() {
                                             )}
                                           </div>
                                         ) : (
-                                          <div className="text-[11px] opacity-70">Data isn't available online</div>
+                                          <div className="text-[11px] opacity-70">Data isn&apos;t available online</div>
                                         )}
                                       </div>
                                     </div>
