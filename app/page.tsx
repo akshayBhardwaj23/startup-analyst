@@ -1240,8 +1240,16 @@ export default function Home() {
                           }
 
                           const val: any = (brief as any)[section.key];
-                          if (!val || (Array.isArray(val) && val.length === 0)) return null;
                           const renderVal = () => {
+                            const isEmptyTextRefs = (o: any) =>
+                              o &&
+                              typeof o === "object" &&
+                              typeof o.text === "string" &&
+                              o.text.trim() === "" &&
+                              Array.isArray(o.refs) &&
+                              o.refs.length === 0;
+
+                            if (val == null) return null;
                             // Nested object special cases (icp_gtm, tam)
                             if (
                               section.nested &&
@@ -1249,10 +1257,17 @@ export default function Home() {
                               typeof val === "object" &&
                               !Array.isArray(val)
                             ) {
+                              const nestedKeys = section.nested.filter((sub) => {
+                                const node = (val as any)[sub];
+                                if (!node) return false;
+                                if (typeof node === "object" && isEmptyTextRefs(node)) return false;
+                                return true;
+                              });
+                              if (nestedKeys.length === 0) return null;
                               return (
                                 <div className="space-y-2">
-                                  {section.nested.map((sub) => {
-                                    const node = val[sub];
+                                  {nestedKeys.map((sub) => {
+                                    const node = (val as any)[sub];
                                     if (!node) return null;
                                     const nodeText =
                                       typeof node === "object"
@@ -1280,11 +1295,15 @@ export default function Home() {
                               );
                             }
                             if (Array.isArray(val)) {
+                              const items = (val as any[]).filter((v) =>
+                                !(typeof v === "object" && v && isEmptyTextRefs(v))
+                              );
+                              if (items.length === 0) return null;
                               // Hypotheses: objects with claim/status
                               if (section.key === "hypotheses") {
                                 return (
                                   <ul className="space-y-2">
-                                    {val.map((h: any, i: number) => (
+                                    {items.map((h: any, i: number) => (
                                       <li
                                         key={i}
                                         className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2.5"
@@ -1308,7 +1327,7 @@ export default function Home() {
                               if (section.key === "founder_questions") {
                                 return (
                                   <ol className="space-y-3 list-decimal pl-4 marker:text-indigo-300/60">
-                                    {val.map((q: any, i: number) => (
+                                    {items.map((q: any, i: number) => (
                                       <li key={i} className="space-y-1">
                                         {q.question && (
                                           <div className="font-medium text-[11px] md:text-[12px] leading-snug text-indigo-100/90">
@@ -1327,7 +1346,7 @@ export default function Home() {
                               }
                               return (
                                 <ul className="list-disc pl-4 space-y-1 marker:text-indigo-400/70">
-                                  {val.map((v: any, i: number) => (
+                                  {items.map((v: any, i: number) => (
                                     <li key={i} className="opacity-90">
                                       {typeof v === "object"
                                         ? v.text || JSON.stringify(v)
@@ -1338,6 +1357,7 @@ export default function Home() {
                               );
                             }
                             if (typeof val === "object") {
+                              if (isEmptyTextRefs(val)) return null;
                               const text =
                                 (val as any).text ||
                                 JSON.stringify(val, null, 2);
@@ -1351,6 +1371,8 @@ export default function Home() {
                               <div className="opacity-90">{String(val)}</div>
                             );
                           };
+                          const content = renderVal();
+                          if (!content) return null;
                           return (
                             <div
                               key={section.key}
@@ -1360,7 +1382,7 @@ export default function Home() {
                                 <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                                 {section.label}
                               </div>
-                              {renderVal()}
+                              {content}
                             </div>
                           );
                         })}
