@@ -643,7 +643,25 @@ export default function Home() {
   setWebSearch(null);
       if (files.length === 0) throw new Error("Upload files first");
 
-      // 1) Upload files to Vercel Blob via client SDK (streams, avoids body size limits)
+      // 1) First, run web-search via Gemini Flash-Lite (Vertex) before analysis
+      try {
+        setWebLoading(true);
+        const res = await fetch("/api/web-search", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ companyName: companyName.trim() }),
+        });
+        const ct = res.headers.get("content-type") || "";
+        if (!res.ok) throw new Error(await res.text());
+        const payload = ct.includes("application/json") ? await res.json() : {};
+        setWebSearch(payload?.web ?? {});
+      } catch (e) {
+        setWebSearch({});
+      } finally {
+        setWebLoading(false);
+      }
+
+      // 2) Upload files to Vercel Blob via client SDK (streams, avoids body size limits)
       const uploadedUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -654,7 +672,7 @@ export default function Home() {
         uploadedUrls.push(url);
       }
 
-      // 2) Call analysis with Blob URLs (small JSON body)
+      // 3) Call analysis with Blob URLs (small JSON body)
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -681,30 +699,6 @@ export default function Home() {
     }
   };
 
-  // When brief is ready and we have companyName, fetch web-search summary via Gemini Flash-Lite
-  useEffect(() => {
-    const run = async () => {
-      if (!brief || !companyName || !companyName.trim()) return;
-      try {
-        setWebLoading(true);
-        const res = await fetch("/api/web-search", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ companyName: companyName.trim() }),
-        });
-        const ct = res.headers.get("content-type") || "";
-        if (!res.ok) throw new Error(await res.text());
-        const payload = ct.includes("application/json") ? await res.json() : {};
-        setWebSearch(payload?.web ?? {});
-      } catch (e) {
-        setWebSearch({});
-      } finally {
-        setWebLoading(false);
-      }
-    };
-    run();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brief]);
 
   const totalFiles = files.length;
   const removeFileAt = (idx: number) => {
