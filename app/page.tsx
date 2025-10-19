@@ -1,5 +1,8 @@
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
+
+const ChatDrawer = dynamic(() => import("./components/ChatDrawer"), { ssr: false });
 import { upload } from "@vercel/blob/client";
 import { useSession } from "next-auth/react";
 
@@ -131,6 +134,7 @@ export default function Home() {
   const [copied, setCopied] = useState(false);
   const [webSearch, setWebSearch] = useState<any | null>(null);
   const [webLoading, setWebLoading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
   const [previousRuns, setPreviousRuns] = useState<Array<{
     id: string;
     createdAt: string;
@@ -959,7 +963,7 @@ export default function Home() {
                   VC Style Summary
                 </h2>
               </div>
-              {brief && (
+                {brief && (
                 <div className="flex items-center gap-2" data-noexport="true">
                   <button
                     onClick={onDownloadPDF}
@@ -984,8 +988,17 @@ export default function Home() {
                     </svg>
                     <span>Download PDF</span>
                   </button>
+                  <button
+                    onClick={() => setChatOpen(true)}
+                    className="btn-primary text-sm flex items-center gap-2"
+                    title="Ask the startup"
+                  >
+                    💬 Ask the Startup
+                  </button>
                 </div>
               )}
+
+              <ChatDrawer open={chatOpen} onClose={() => setChatOpen(false)} companyName={companyName} />
             </div>
             <div className="divider" />
             <div className="relative flex-1">
