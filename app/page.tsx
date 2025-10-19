@@ -180,7 +180,7 @@ export default function Home() {
     return lines.join("\n").trim();
   };
 
-  // Build a custom 1-page A4 PDF (no screenshot) with a two-column layout
+  // Build a custom multi-page A4 PDF (no screenshot) with a two-column layout
   const onDownloadPDF = useCallback(async () => {
     if (!brief) return;
     try {
@@ -275,8 +275,8 @@ export default function Home() {
         margin + headerHeight
       );
 
-      let leftY = margin + headerHeight + 10;
-      let rightY = margin + headerHeight + 10;
+  let leftY = margin + headerHeight + 10;
+  let rightY = margin + headerHeight + 10;
 
       const hexToRgb = (hex: string): [number, number, number] => {
         const h = hex.replace("#", "");
@@ -292,10 +292,6 @@ export default function Home() {
         (pdf as any).setLineCap && (pdf as any).setLineCap(cap);
         pdf.setDrawColor(r, g, b);
         pdf.setLineWidth(w);
-      };
-      const setFill = (hex: string) => {
-        const [r, g, b] = hexToRgb(hex);
-        pdf.setTextColor(r, g, b);
       };
       const textColor = (pdf as any).getTextColor
         ? (pdf as any).getTextColor()
@@ -373,30 +369,85 @@ export default function Home() {
         return r + 24 + 10; // arc height + label + padding
       };
 
-      const addHeading = (text: string) => {
+      const newPage = () => {
+        pdf.addPage();
+        leftY = margin; // no repeated header on subsequent pages
+        rightY = margin;
+        // optional top divider for consistency
+        pdf.setDrawColor(230, 230, 235);
+        pdf.setLineWidth(0.6);
+        pdf.line(margin, margin - 6, pageWidth - margin, margin - 6);
+      };
+
+      const writeUrlLine = (
+        x: number,
+        yRef: "right" | "left",
+        url: string,
+        color: [number, number, number] = [56, 116, 203]
+      ) => {
+        if (!url) return;
+        const maxW = yRef === "right" ? rightW : leftW;
+        const lineH = 13;
+        const lines = pdf.splitTextToSize(url, maxW);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.setTextColor(...color);
+        let y = yRef === "right" ? rightY : leftY;
+        for (const ln of lines) {
+          if (y > pageHeight - margin) {
+            newPage();
+            y = yRef === "right" ? rightY : leftY;
+          }
+          pdf.text(ln, x, y);
+          // clickable area for the entire line
+          try {
+            const w = (pdf as any).getTextWidth ? (pdf as any).getTextWidth(ln) : Math.min(ln.length * 6, maxW);
+            pdf.link(x, y - 10, Math.min(w, maxW), 14, { url });
+          } catch {}
+          y += lineH;
+        }
+        if (yRef === "right") rightY = y + 2; else leftY = y + 2;
+      };
+
+      const addHeading = (text: string, yRef: "right" | "left") => {
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(11);
         pdf.setTextColor(99, 102, 241); // indigo-ish
-        pdf.text(text.toUpperCase(), rightX, rightY);
-        rightY += 14;
+        const y = yRef === "right" ? rightY : leftY;
+        const x = yRef === "right" ? rightX : leftX;
+        if (y + 14 > pageHeight - margin) {
+          newPage();
+        }
+        pdf.text(text.toUpperCase(), x, yRef === "right" ? rightY : leftY);
+        if (yRef === "right") rightY += 14; else leftY += 14;
       };
+
       const addParagraph = (
         text: string,
-        maxW: number,
+        yRef: "right" | "left",
         color: [number, number, number] = [34, 34, 34]
       ) => {
+        const maxW = yRef === "right" ? rightW : leftW;
+        const x = yRef === "right" ? rightX : leftX;
+        const lines = pdf.splitTextToSize(text, maxW);
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(10);
-        const lines = pdf.splitTextToSize(text, maxW);
         pdf.setTextColor(...color);
         const lineH = 13;
+        let y = yRef === "right" ? rightY : leftY;
         for (const ln of lines) {
-          if (rightY > pageHeight - margin) break; // truncate to one page
-          pdf.text(ln, rightX, rightY);
-          rightY += lineH;
+          if (y > pageHeight - margin) {
+            newPage();
+            y = yRef === "right" ? rightY : leftY;
+          }
+          pdf.text(ln, x, y);
+          y += lineH;
         }
-        rightY += 6;
+        if (yRef === "right") rightY = y + 6; else leftY = y + 6;
       };
+      const isEmptyTextRefs = (o: any) =>
+        o && typeof o === "object" && typeof o.text === "string" && o.text.trim() === "" && Array.isArray(o.refs) && o.refs.length === 0;
+
       const toLinesStr = (value: any): string => {
         if (Array.isArray(value))
           return value
@@ -404,8 +455,10 @@ export default function Home() {
               typeof v === "object" ? v.text ?? JSON.stringify(v) : String(v)
             )
             .join("\n");
-        if (value && typeof value === "object")
+        if (value && typeof value === "object") {
+          if (isEmptyTextRefs(value)) return "";
           return String((value as any).text ?? JSON.stringify(value, null, 2));
+        }
         if (value == null) return "";
         return String(value);
       };
@@ -531,6 +584,7 @@ export default function Home() {
       const formatList = (arr: any): string => {
         if (!Array.isArray(arr)) return toLinesStr(arr);
         return arr
+          .filter((v: any) => !(typeof v === "object" && isEmptyTextRefs(v)))
           .map(
             (v: any) =>
               "• " +
@@ -539,14 +593,44 @@ export default function Home() {
           .join("\n");
       };
 
-      type Section = { title: string; text: string };
+      // Web-search sections
+      const formatWebLatest = (web: any): { title: string; blocks: Array<{text: string; url?: string}> } | null => {
+        const list = Array.isArray(web?.latest_online_updates) ? web.latest_online_updates : [];
+        const items = list.filter((u: any) => u && typeof u === "object" && (u.summary || u.source));
+        if (items.length === 0) return null;
+        return {
+          title: "Online: Latest Updates",
+          blocks: items.map((u: any) => ({ text: String(u.summary || ""), url: u.source || undefined })),
+        };
+      };
+      const formatWebGrowth = (web: any): { title: string; text: string; url?: string } | null => {
+        const mg = web?.market_growth || null;
+        const summary = mg?.summary ? String(mg.summary) : "";
+        const source = mg?.source ? String(mg.source) : undefined;
+        if (!summary) return null;
+        return { title: "Online: Market Growth", text: summary, url: source };
+      };
+
+      type Section = { title: string; text: string; linkUrls?: string[] };
       const sections: Section[] = [];
-      const pushIf = (title: string, text: string) => {
-        if (text && text.trim()) sections.push({ title, text: text.trim() });
+      const pushIf = (title: string, text: string, linkUrls?: string[]) => {
+        if (text && text.trim()) sections.push({ title, text: text.trim(), linkUrls });
       };
       pushIf("Problem", toLinesStr((brief as any).problem));
       pushIf("Solution", toLinesStr((brief as any).solution));
       pushIf("ICP & GTM", formatICPGTM((brief as any).icp_gtm));
+      // Insert web-search sections here
+      const webLatest = formatWebLatest(webSearch);
+      if (webLatest) {
+        // We collect as a single text block with bullets; links rendered line-by-line later
+        const text = webLatest.blocks.map((b) => `• ${b.text}`).join("\n");
+        const urls = webLatest.blocks.map((b) => b.url).filter(Boolean) as string[];
+        pushIf(webLatest.title, text, urls);
+      }
+      const webGrowth = formatWebGrowth(webSearch);
+      if (webGrowth) {
+        pushIf(webGrowth.title, webGrowth.text, webGrowth.url ? [webGrowth.url] : undefined);
+      }
       pushIf("Traction", formatList((brief as any).traction_bullets));
       pushIf("Business Model", toLinesStr((brief as any).business_model));
       pushIf("TAM", formatTAM((brief as any).tam));
@@ -556,46 +640,25 @@ export default function Home() {
 
       const maxY = pageHeight - margin;
       const writeSection = (s: Section) => {
-        // Heading: prefer right column; if no space there, try left below gauges
-        const writeHeadingTo = (x: number, yRef: "right" | "left") => {
-          pdf.setFont("helvetica", "bold");
-          pdf.setFontSize(11);
-          pdf.setTextColor(99, 102, 241);
-          const y = yRef === "right" ? rightY : leftY;
-          pdf.text(s.title.toUpperCase(), x, y);
-          if (yRef === "right") rightY += 14;
-          else leftY += 14;
-        };
-        const writeParaTo = (x: number, w: number, yRef: "right" | "left") => {
-          const lines = pdf.splitTextToSize(s.text, w);
-          pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(10);
-          pdf.setTextColor(34, 34, 34);
-          const lineH = 13;
-          let y = yRef === "right" ? rightY : leftY;
-          for (const ln of lines) {
-            if (y >= maxY) return false; // full
-            pdf.text(ln, x, y);
-            y += lineH;
+        const tryWrite = (yRef: "right" | "left") => {
+          addHeading(s.title, yRef);
+          addParagraph(s.text, yRef);
+          if (s.linkUrls && s.linkUrls.length) {
+            // Render each link on its own line
+            for (const u of s.linkUrls) writeUrlLine(yRef === "right" ? rightX : leftX, yRef, u);
           }
-          if (yRef === "right") rightY = y + 6;
-          else leftY = y + 6;
-          return true;
         };
 
-        // Try right column first
-        if (rightY + 26 < maxY) {
-          writeHeadingTo(rightX, "right");
-          if (!writeParaTo(rightX, rightW, "right")) {
-            // Continue on left if space
-            if (leftY + 26 < maxY) {
-              writeHeadingTo(leftX, "left");
-              writeParaTo(leftX, leftW, "left");
-            }
-          }
-        } else if (leftY + 26 < maxY) {
-          writeHeadingTo(leftX, "left");
-          writeParaTo(leftX, leftW, "left");
+        // Prefer right, then left; if both out of space, add a page and then write on right
+        const spaceRight = rightY + 26 < maxY;
+        const spaceLeft = leftY + 26 < maxY;
+        if (spaceRight) {
+          tryWrite("right");
+        } else if (spaceLeft) {
+          tryWrite("left");
+        } else {
+          newPage();
+          tryWrite("right");
         }
       };
 
@@ -606,7 +669,7 @@ export default function Home() {
       console.error("PDF export failed", e);
       setError("Failed to generate PDF");
     }
-  }, [brief, companyName]);
+  }, [brief, companyName, webSearch]);
 
   // Safely coerce possible array / object fields to display text
   const toLines = (value: any): string => {
