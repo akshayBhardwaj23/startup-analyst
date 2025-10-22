@@ -118,9 +118,7 @@ export async function POST(req: NextRequest) {
   "risks_bullets": [ {"text":"...","refs":[...]}, ... ],
   "ansoff_matrix": {
     "quadrant": "MARKET_PENETRATION|MARKET_DEVELOPMENT|PRODUCT_DEVELOPMENT|DIVERSIFICATION",
-    "rationale": {"text":"...","refs":[...]},
-    "risk_level": "LOW|MEDIUM|HIGH",
-    "risk_factors": [ {"text":"...","refs":[...]}, ... ]
+    "rationale": {"text":"...","refs":[...]}
   },
   "why_now": {"text":"...","refs":[...]},
   "hypotheses": [ {"claim":"...","status":"NO-EVIDENCE|SUPPORTED","refs":[...]}, ... ],
@@ -145,8 +143,6 @@ Rules:
 - Ansoff Matrix Analysis:
   - Determine which quadrant the product/strategy fits: MARKET_PENETRATION (existing product, existing market), MARKET_DEVELOPMENT (existing product, new market), PRODUCT_DEVELOPMENT (new product, existing market), or DIVERSIFICATION (new product, new market).
   - Provide rationale explaining why this quadrant applies based on evidence in documents.
-  - Assess risk level: LOW (proven market/product), MEDIUM (some uncertainty), HIGH (significant unknowns).
-  - List specific risk factors that apply to this quadrant and strategy.
 - Keep language concise, analyst tone.
 - Do NOT invent numbers; if TAM components not present, still include keys with empty text "" and empty refs [].
 - Ratings:

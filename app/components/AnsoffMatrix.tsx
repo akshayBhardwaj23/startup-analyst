@@ -8,33 +8,20 @@ type AnsoffQuadrant =
   | "PRODUCT_DEVELOPMENT"
   | "DIVERSIFICATION";
 
-type RiskLevel = "LOW" | "MEDIUM" | "HIGH";
-
 interface AnsoffMatrixData {
   quadrant: AnsoffQuadrant;
   rationale: {
     text: string;
     refs: string[];
   };
-  risk_level: RiskLevel;
-  risk_factors: Array<{
-    text: string;
-    refs: string[];
-  }>;
 }
 
 interface AnsoffMatrixProps {
   data: AnsoffMatrixData;
 }
 
-const riskLevelColors = {
-  LOW: "#22c55e", // green-500
-  MEDIUM: "#f59e0b", // amber-500
-  HIGH: "#ef4444", // red-500
-};
-
 export default function AnsoffMatrix({ data }: AnsoffMatrixProps) {
-  const { quadrant, rationale, risk_level, risk_factors } = data;
+  const { quadrant, rationale } = data;
 
   return (
     <div className="space-y-4">
@@ -152,50 +139,6 @@ export default function AnsoffMatrix({ data }: AnsoffMatrixProps) {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Risk Assessment */}
-        <div>
-          <h4 className="text-sm font-semibold text-[color:var(--foreground)] mb-2">
-            Risk Assessment
-          </h4>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-sm text-[color:var(--foreground)] opacity-80">
-              Risk Level:
-            </span>
-            <span
-              className="px-2 py-1 rounded-full text-xs font-medium text-white"
-              style={{ backgroundColor: riskLevelColors[risk_level] }}
-            >
-              {risk_level}
-            </span>
-          </div>
-
-          {risk_factors && risk_factors.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-[color:var(--foreground)] opacity-80">
-                Key Risk Factors:
-              </div>
-              <ul className="space-y-1">
-                {risk_factors.map((factor, index) => (
-                  <li
-                    key={index}
-                    className="text-sm opacity-70 flex items-start gap-2"
-                  >
-                    <span className="opacity-50 mt-1">•</span>
-                    <span>
-                      {factor.text}
-                      {factor.refs && factor.refs.length > 0 && (
-                        <span className="text-xs opacity-60 ml-1">
-                          ({factor.refs.join(", ")})
-                        </span>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
     </div>
