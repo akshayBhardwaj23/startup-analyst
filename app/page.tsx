@@ -2,7 +2,12 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import dynamic from "next/dynamic";
 
-const ChatDrawer = dynamic(() => import("./components/ChatDrawer"), { ssr: false });
+const ChatDrawer = dynamic(() => import("./components/ChatDrawer"), {
+  ssr: false,
+});
+const AnsoffMatrix = dynamic(() => import("./components/AnsoffMatrix"), {
+  ssr: false,
+});
 import { upload } from "@vercel/blob/client";
 import { useSession } from "next-auth/react";
 
@@ -176,6 +181,7 @@ export default function Home() {
     add("Team", b.team);
     add("Moat", b.moat_bullets);
     add("Risks", b.risks_bullets);
+    add("Ansoff Matrix", b.ansoff_matrix);
     add("Why now", b.why_now);
     add("Hypotheses", b.hypotheses);
     add("Founder questions", b.founder_questions);
@@ -597,6 +603,49 @@ export default function Home() {
           .join("\n");
       };
 
+      const formatAnsoffMatrix = (obj: any): string => {
+        if (!obj || typeof obj !== "object") return toLinesStr(obj);
+        const parts: string[] = [];
+
+        if (obj.quadrant) {
+          const quadrantMap: Record<string, string> = {
+            MARKET_PENETRATION:
+              "Market Penetration (Existing Product, Existing Market)",
+            MARKET_DEVELOPMENT:
+              "Market Development (Existing Product, New Market)",
+            PRODUCT_DEVELOPMENT:
+              "Product Development (New Product, Existing Market)",
+            DIVERSIFICATION: "Diversification (New Product, New Market)",
+          };
+          parts.push(`Strategy: ${quadrantMap[obj.quadrant] || obj.quadrant}`);
+        }
+
+        if (obj.rationale) {
+          const rationaleText = toLinesStr(obj.rationale);
+          if (rationaleText) parts.push(`Rationale: ${rationaleText}`);
+        }
+
+        if (obj.risk_level) {
+          parts.push(`Risk Level: ${obj.risk_level}`);
+        }
+
+        if (obj.risk_factors && Array.isArray(obj.risk_factors)) {
+          const riskFactors = obj.risk_factors
+            .filter((v: any) => !(typeof v === "object" && isEmptyTextRefs(v)))
+            .map(
+              (v: any) =>
+                "• " +
+                (typeof v === "object"
+                  ? v.text ?? JSON.stringify(v)
+                  : String(v))
+            )
+            .join("\n");
+          if (riskFactors) parts.push(`Risk Factors:\n${riskFactors}`);
+        }
+
+        return parts.join("\n\n");
+      };
+
       // Web-search sections
       const formatWebLatest = (web: any): { title: string; blocks: Array<{text: string; url?: string}> } | null => {
         const list = Array.isArray(web?.latest_online_updates) ? web.latest_online_updates : [];
@@ -641,6 +690,7 @@ export default function Home() {
       pushIf("Team", toLinesStr((brief as any).team));
       pushIf("Moat", formatList((brief as any).moat_bullets));
       pushIf("Risks", formatList((brief as any).risks_bullets));
+      pushIf("Ansoff Matrix", formatAnsoffMatrix((brief as any).ansoff_matrix));
 
       const maxY = pageHeight - margin;
       const writeSection = (s: Section) => {
@@ -1241,6 +1291,7 @@ export default function Home() {
                             label: "Moat / Defensibility",
                           },
                           { key: "risks_bullets", label: "Risks" },
+                          { key: "ansoff_matrix", label: "Ansoff Matrix" },
                           { key: "why_now", label: "Why Now" },
                           { key: "hypotheses", label: "Hypotheses" },
                           {
@@ -1431,6 +1482,14 @@ export default function Home() {
                                   ))}
                                 </ul>
                               );
+                            }
+                            // Ansoff Matrix: special rendering with component
+                            if (
+                              section.key === "ansoff_matrix" &&
+                              typeof val === "object"
+                            ) {
+                              if (!val.quadrant) return null;
+                              return <AnsoffMatrix data={val} />;
                             }
                             if (typeof val === "object") {
                               if (isEmptyTextRefs(val)) return null;
