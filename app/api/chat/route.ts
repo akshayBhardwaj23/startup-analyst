@@ -21,10 +21,9 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
       try {
-        // 1) Fetch web context (non-stream) using flash-lite
+        // 1) Fetch web context (non-stream) with robust JSON handling and model fallback
         let webContext = "";
-        try {
-          const buildPrompt = (name: string) => `You are an AI analyst helping investors research startups.
+        const buildPrompt = (name: string) => `You are an AI analyst helping investors research startups.
 
 Perform a concise web search and summarize ONLY two areas:
 1. Latest online or news updates about the company (product launches, funding, partnerships, major announcements).
@@ -51,26 +50,66 @@ Rules:
 
 Company to research: ${name}`;
 
-          const model = process.env.VERTEX_FLASH_LITE_MODEL || "gemini-2.0-flash-lite";
-          const g = vertex.getGenerativeModel({ model });
-          const webPrompt = buildPrompt(companyName);
-          const result: any = await (g as any).generateContent({
-            contents: [{ role: "user", parts: [{ text: webPrompt }] }],
-            generationConfig: { temperature: 0 },
-          } as any);
-          let text = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          // Redact URLs per requirement
-          text = text.replace(/https?:[^\s\"]+/g, "");
-          webContext = text;
-        } catch {}
+        const modelOrder = [
+          process.env.VERTEX_FLASH_LITE_MODEL || "gemini-2.0-flash-lite",
+          "gemini-1.5-flash",
+        ];
+
+        const extractJson = (s: string): any | null => {
+          if (!s) return null;
+          const fenced = s.match(/```json\s*([\s\S]*?)```/i) || s.match(/```\s*([\s\S]*?)```/i);
+          const candidate = fenced ? fenced[1] : s;
+          const start = candidate.indexOf("{");
+          const end = candidate.lastIndexOf("}");
+          if (start !== -1 && end !== -1 && end > start) {
+            const slice = candidate.slice(start, end + 1);
+            try { return JSON.parse(slice); } catch {}
+          }
+          try { return JSON.parse(candidate); } catch { return null; }
+        };
+
+        const prompts = [
+          buildPrompt(companyName),
+          buildPrompt(companyName) + "\n\nSTRICT: Return only pure JSON without code fences or any extra text.",
+        ];
+
+        let parsed: any | null = null;
+        // up to 3 attempts (2 prompts, with model fallback between)
+        for (let i = 0; i < 3; i++) {
+          const prompt = prompts[Math.min(i, prompts.length - 1)];
+          const model = modelOrder[Math.min(i, modelOrder.length - 1)];
+          try {
+            const g = vertex.getGenerativeModel({ model });
+            const result: any = await (g as any).generateContent({
+              contents: [{ role: "user", parts: [{ text: prompt }] }],
+              generationConfig: {
+                temperature: 0,
+                responseMimeType: "application/json",
+              },
+            } as any);
+            const text = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+            parsed = extractJson(text);
+            if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) break;
+          } catch {}
+        }
+
+        if (parsed) {
+          // Redact URLs from JSON string to satisfy no-URL requirement in final answer
+          try {
+            const redacted = JSON.parse(JSON.stringify(parsed).replace(/https?:[^\s\"]+/g, ""));
+            webContext = JSON.stringify(redacted);
+          } catch {
+            webContext = JSON.stringify(parsed);
+          }
+        } else {
+          webContext = "";
+        }
 
         const combinedContext = webContext ? `WEB_CONTEXT:\n${webContext}\n\n` : "";
-        const finalPrompt = `You are an AI analyst answering investor questions about ${companyName}.
-Use ONLY WEB_CONTEXT (online sources). Do not rely on any uploaded documents or prior local context. Do not include URLs in the answer.
+  const finalPrompt = `You are an AI analyst answering investor questions about ${companyName}.
+Useonline sources.  Do not include URLs in the answer.
 
 Question: ${question}
-
-${combinedContext}
 
 Answer concisely without URLs.`;
 
