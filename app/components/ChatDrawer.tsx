@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 type Message = { id: string; role: "user" | "assistant" | "system"; text: string };
 
@@ -18,6 +19,9 @@ export default function ChatDrawer({
   const scroller = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
+  const pendingRef = useRef<string>("");
+  const typingRef = useRef(false);
+  const timerRef = useRef<number | null>(null);
 
   // Persist chat per company
   const storageKey = useMemo(() => {
@@ -72,19 +76,6 @@ export default function ChatDrawer({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Click outside to close (no overlay)
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      const el = panelRef.current;
-      if (!el) return;
-      if (e.target instanceof Node && !el.contains(e.target)) {
-        onClose();
-      }
-    };
-    document.addEventListener("mousedown", onDown);
-    return () => document.removeEventListener("mousedown", onDown);
-  }, [open, onClose]);
 
   const send = async () => {
     if (!input.trim()) return;
@@ -98,9 +89,36 @@ export default function ChatDrawer({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ companyName, question: userMsg.text }),
       });
-      if (!res.ok) throw new Error(await res.text());
-      const data = await res.json();
-      setMessages((m) => [...m, { id: "a" + Date.now(), role: "assistant", text: data.answer || "(no answer)" }]);
+      if (!res.ok || !res.body) throw new Error(await res.text());
+      const aId = "a" + Date.now();
+      setMessages((m) => [...m, { id: aId, role: "assistant", text: "" }]);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      const startTyper = () => {
+        if (typingRef.current) return;
+        typingRef.current = true;
+        const tick = () => {
+          if (!pendingRef.current.length) {
+            typingRef.current = false;
+            timerRef.current = null;
+            return;
+          }
+          const take = pendingRef.current.slice(0, 3);
+          pendingRef.current = pendingRef.current.slice(3);
+          setMessages((m) => m.map((msg) => (msg.id === aId ? { ...msg, text: msg.text + take } : msg)));
+          timerRef.current = window.setTimeout(tick, 15) as any;
+        };
+        tick();
+      };
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        if (chunk) {
+          pendingRef.current += chunk;
+          startTyper();
+        }
+      }
     } catch (e: any) {
       setMessages((m) => [
         ...m,
@@ -111,14 +129,25 @@ export default function ChatDrawer({
     }
   };
 
+  // Cleanup any timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current);
+      typingRef.current = false;
+      pendingRef.current = "";
+    };
+  }, []);
+
   if (!open) return null;
 
-  return (
-  <div className="fixed inset-0 pointer-events-none z-50">
-      {/* Drawer panel: top-right, fixed height 600px; no overlay */}
+  const content = (
+    <div className="fixed inset-0 z-[9999] pointer-events-none">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/60 pointer-events-auto" onClick={onClose} />
+      {/* Large fixed chat panel (viewport-based), centered modal 85vw x 85vh */}
       <div
         ref={panelRef}
-        className="pointer-events-auto absolute right-4 md:right-6 top-4 md:top-6 h-[600px] w-[92vw] max-w-md md:max-w-lg md:w-[480px] bg-[#0b1220] text-white shadow-2xl flex flex-col rounded-xl border border-white/10 animate-[slideIn_.2s_ease-out]"
+        className="pointer-events-auto fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[85vh] w-[85vw] max-w-[1400px] bg-[#0b1220] text-white shadow-2xl flex flex-col rounded-xl border border-white/10"
       >
         <div className="p-4 border-b border-white/10">
           <div className="flex items-center justify-between">
@@ -176,4 +205,7 @@ export default function ChatDrawer({
       </div>
     </div>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(content, document.body);
 }

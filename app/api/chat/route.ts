@@ -16,10 +16,15 @@ export async function POST(req: NextRequest) {
   const { companyName, question } = body as { companyName?: string; question?: string };
   if (!companyName || !question) return NextResponse.json({ error: "Missing fields" }, { status: 400 });
 
-  // Always invoke Vertex web-search (reuse web-search prompt) — ONLY online sources
-  let webContext = "";
-  try {
-    const buildPrompt = (name: string) => `You are an AI analyst helping investors research startups.
+  // Stream the final answer using ONLY online sources
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const encoder = new TextEncoder();
+      try {
+        // 1) Fetch web context (non-stream) using flash-lite
+        let webContext = "";
+        try {
+          const buildPrompt = (name: string) => `You are an AI analyst helping investors research startups.
 
 Perform a concise web search and summarize ONLY two areas:
 1. Latest online or news updates about the company (product launches, funding, partnerships, major announcements).
@@ -46,42 +51,60 @@ Rules:
 
 Company to research: ${name}`;
 
-    const model = process.env.VERTEX_FLASH_LITE_MODEL || "gemini-2.0-flash-lite";
-    const g = vertex.getGenerativeModel({ model });
-    const webPrompt = buildPrompt(companyName);
-    const result: any = await (g as any).generateContent({
-      contents: [{ role: "user", parts: [{ text: webPrompt }] }],
-      generationConfig: { temperature: 0 },
-    } as any);
-    let text = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    // Redact URLs per requirement
-    text = text.replace(/https?:[^\s\"]+/g, "");
-    webContext = text;
-  } catch (e) {
-    webContext = "";
-  }
+          const model = process.env.VERTEX_FLASH_LITE_MODEL || "gemini-2.0-flash-lite";
+          const g = vertex.getGenerativeModel({ model });
+          const webPrompt = buildPrompt(companyName);
+          const result: any = await (g as any).generateContent({
+            contents: [{ role: "user", parts: [{ text: webPrompt }] }],
+            generationConfig: { temperature: 0 },
+          } as any);
+          let text = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          // Redact URLs per requirement
+          text = text.replace(/https?:[^\s\"]+/g, "");
+          webContext = text;
+        } catch {}
 
-
-  // Compose final prompt: ONLY use web context
-  const finalPrompt = `You are an AI analyst answering investor questions about ${companyName}.
-Use ONLY online sources. Do not include URLs in the answer.
+        const combinedContext = webContext ? `WEB_CONTEXT:\n${webContext}\n\n` : "";
+        const finalPrompt = `You are an AI analyst answering investor questions about ${companyName}.
+Use ONLY WEB_CONTEXT (online sources). Do not rely on any uploaded documents or prior local context. Do not include URLs in the answer.
 
 Question: ${question}
 
+${combinedContext}
+
 Answer concisely without URLs.`;
 
-  try {
-    const model = process.env.VERTEX_CHAT_MODEL || "gemini-2.5-pro";
-    const gem = vertex.getGenerativeModel({ model });
-    const resp: any = await (gem as any).generateContent({
-      contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
-      generationConfig: { temperature: 0.1 },
-    } as any);
-  let ans = resp?.response?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  // Ensure no URLs leaked in answer
-  ans = ans.replace(/https?:[^\s\"]+/g, "");
-  return NextResponse.json({ answer: ans, usedLocal: false, source: "web-only" });
-  } catch (e: any) {
-    return NextResponse.json({ error: String(e?.message || e) }, { status: 500 });
-  }
+        // 2) Stream final answer from chat model
+        const chatModel = process.env.VERTEX_CHAT_MODEL || "gemini-2.5-pro";
+        const gem = vertex.getGenerativeModel({ model: chatModel });
+        const resp: any = await (gem as any).generateContentStream({
+          contents: [{ role: "user", parts: [{ text: finalPrompt }] }],
+          generationConfig: { temperature: 0.1 },
+        } as any);
+
+        for await (const item of (resp as any).stream as AsyncIterable<any>) {
+          const chunk =
+            item?.candidates?.[0]?.content?.parts?.map((p: any) => p?.text || "").join("") ||
+            item?.candidates?.[0]?.content?.parts?.[0]?.text ||
+            "";
+          if (!chunk) continue;
+          const cleaned = chunk.replace(/https?:[^\s\"]+/g, "");
+          controller.enqueue(encoder.encode(cleaned));
+        }
+      } catch (e: any) {
+        const msg = `Error: ${String(e?.message || e)}`;
+        controller.enqueue(encoder.encode(msg));
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }
