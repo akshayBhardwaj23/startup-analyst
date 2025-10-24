@@ -148,10 +148,38 @@ Company: ${companyName || "Unknown"}
 
 Documents:\n${chunks}`;
 
-  const result: any = await gemini.generateContent({
-    contents: [{ role: "user", parts: [{ text: prompt }] }],
-    generationConfig: { temperature: 0.2 },
-  } as any);
+  // Retry with exponential backoff for rate limit errors
+  let result: any;
+  let lastError: any;
+  const maxRetries = 3;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      result = await gemini.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.2 },
+      } as any);
+      break; // Success, exit retry loop
+    } catch (err: any) {
+      lastError = err;
+      if (err.code === 429 && attempt < maxRetries - 1) {
+        // Exponential backoff: 2s, 4s, 8s
+        const delayMs = Math.pow(2, attempt + 1) * 1000;
+        console.log(
+          `Rate limited, retrying in ${delayMs}ms (attempt ${
+            attempt + 1
+          }/${maxRetries})`
+        );
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      } else {
+        throw err; // Not a rate limit or final attempt, throw error
+      }
+    }
+  }
+
+  if (!result) {
+    throw lastError || new Error("Failed to generate content after retries");
+  }
 
   const text =
     result?.response?.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
@@ -214,5 +242,9 @@ Documents:\n${chunks}`;
     select: { id: true, createdAt: true, brief: true },
   });
 
-  return NextResponse.json({ brief: parsed, previousRuns: previous });
+  return NextResponse.json({
+    brief: parsed,
+    previousRuns: previous,
+    runId: run.id,
+  });
 }
