@@ -47,7 +47,7 @@ function Gauge({
   const dashGap = 100 - dashLen;
   const dashOffset = -capComp / 2;
   return (
-    <div className="rounded-lg border border-white/5 bg-white/[0.02] p-2 text-[color:var(--foreground)]">
+    <div className="rounded-lg border border-slate-200/60 dark:border-white/5 bg-slate-100/80 dark:bg-white/[0.02] p-2 text-slate-800 dark:text-slate-200">
       <svg
         viewBox={`0 0 ${width} ${height}`}
         width="100%"
@@ -57,9 +57,10 @@ function Gauge({
         <path
           d={`M ${startX} ${startY} A ${r} ${r} 0 0 1 ${fullEndX} ${fullEndY}`}
           fill="none"
-          stroke="#334155"
+          stroke="currentColor"
           strokeWidth={strokeW}
           strokeLinecap="butt"
+          className="opacity-20"
         />
         {safe != null && safe > 0 && (
           <path
@@ -98,7 +99,7 @@ function Gauge({
           </text>
         )}
       </svg>
-      <div className="mt-0.5 text-center text-[10px] uppercase tracking-wider font-semibold opacity-60 text-[color:var(--foreground)]">
+      <div className="mt-0.5 text-center text-[10px] uppercase tracking-wider font-semibold opacity-60">
         {label}
       </div>
     </div>
@@ -241,48 +242,126 @@ export default function ResultView({
   const rest = hasOverall ? items.filter((e) => e.key !== "overall") : items;
 
   return (
-    <div className="max-w-screen-2xl mx-auto">
-      <header className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            {companyName}
-          </h1>
-          <div className="text-xs opacity-70">
-            Generated {new Date(createdAt).toLocaleString()}
+    <div className="max-w-7xl mx-auto text-slate-900 dark:text-slate-100">
+      {/* Header */}
+      <div className="mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-6">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700/40 mb-4">
+              <span
+                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                style={{ backgroundColor: "#10b981" }}
+              ></span>
+              <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                Analysis Complete
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-2">
+              {companyName}
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Generated{" "}
+              {new Date(createdAt).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <button
+              onClick={onDownloadPDF}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-300 dark:hover:border-indigo-600 text-slate-700 dark:text-slate-200 font-medium text-sm transition-all hover:shadow-md"
+              title="Download PDF"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              <span>Export PDF</span>
+            </button>
+
+            <button
+              onClick={() => setChatOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-base hover:shadow-lg transition-all"
+              title="Ask the Startup"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                />
+              </svg>
+              <span>Ask Questions</span>
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onDownloadPDF}
-            className="copy-btn flex items-center gap-2"
-            title="Download PDF"
-          >
-            <span className="i-tabler-file-download" />
-            <span>Download PDF</span>
-          </button>
-          <button
-            onClick={() => setChatOpen(true)}
-            className="btn-primary text-sm flex items-center gap-2"
-            title="Ask the Startup"
-          >
-            💬 Ask the Startup
-          </button>
-        </div>
-      </header>
+      </div>
 
-      {error && <div className="mb-4 text-sm text-red-500">{error}</div>}
-
-      {brief?.one_liner && (
-        <div className="text-base md:text-lg font-semibold tracking-tight leading-snug bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent mb-5">
-          {typeof (brief as any).one_liner === "object"
-            ? (brief as any).one_liner.text ||
-              JSON.stringify((brief as any).one_liner)
-            : String((brief as any).one_liner)}
+      {error && (
+        <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+            {error}
+          </p>
         </div>
       )}
 
+      {/* One-liner highlight */}
+      {brief?.one_liner && (
+        <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-blue-200 dark:border-slate-700">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow shadow-blue-500/30">
+              <svg
+                className="w-5 h-5 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-2">
+                One-Liner
+              </div>
+              <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-50 leading-relaxed">
+                {typeof (brief as any).one_liner === "object"
+                  ? (brief as any).one_liner.text ||
+                    JSON.stringify((brief as any).one_liner)
+                  : String((brief as any).one_liner)}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Ratings Section */}
       {items.length > 0 && (
-        <div className="space-y-3 mb-6">
+        <div className="mb-8 p-6 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
           <div
             className="hidden md:grid gap-3"
             style={{
@@ -319,7 +398,8 @@ export default function ResultView({
         </div>
       )}
 
-      <div className="grid gap-5 md:gap-6 text-[11px] md:text-[13px] leading-relaxed">
+      {/* Content Sections */}
+      <div className="grid gap-6 md:grid-cols-2 text-base leading-relaxed">
         {[
           { key: "problem", label: "Problem" },
           { key: "solution", label: "Solution" },
@@ -349,33 +429,52 @@ export default function ResultView({
               (typeof webSearch === "object" &&
                 Object.keys(webSearch).length === 0);
             return (
-              <div key="web-summary-block">
-                <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">
-                  <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-300/80 mb-1 flex items-center gap-1">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Online Summary & Market Growth
+              <div key="web-summary-block" className="md:col-span-2">
+                <div className="p-6 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center">
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-sm font-bold text-emerald-800 dark:text-emerald-100 uppercase tracking-wide">
+                      Online Intelligence
+                    </h3>
                   </div>
                   {webLoading ? (
-                    <div className="text-[11px] opacity-70 flex items-center gap-2">
-                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
+                    <div className="text-[11px] opacity-70 flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                      <span className="h-3 w-3 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-500" />
                       Fetching latest web signals…
                     </div>
                   ) : emptyJson ? (
-                    <div className="text-[11px] opacity-80">
+                    <div className="text-[11px] opacity-80 text-emerald-700 dark:text-emerald-300">
                       Data isn&apos;t available online for these columns
                     </div>
                   ) : (
                     <div className="grid gap-2">
-                      <div className="rounded border border-emerald-500/30 p-2">
-                        <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">
+                      <div className="rounded border border-emerald-400/40 dark:border-emerald-500/30 p-2 bg-white/50 dark:bg-transparent">
+                        <div className="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-200/80 mb-1 font-semibold">
                           Latest Online Updates
                         </div>
                         {Array.isArray(webSearch?.latest_online_updates) &&
                         webSearch.latest_online_updates.length > 0 ? (
-                          <ul className="list-disc pl-4 space-y-1 marker:text-emerald-400/80">
+                          <ul className="list-disc pl-4 space-y-1 marker:text-emerald-600 dark:marker:text-emerald-400/80">
                             {webSearch.latest_online_updates.map(
                               (u: any, i: number) => (
-                                <li key={i} className="text-[11px]">
+                                <li
+                                  key={i}
+                                  className="text-[11px] text-emerald-900 dark:text-emerald-100"
+                                >
                                   <span className="opacity-90">
                                     {u?.summary || ""}
                                   </span>{" "}
@@ -384,7 +483,7 @@ export default function ResultView({
                                       href={u.source}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-emerald-300/90 hover:underline"
+                                      className="text-emerald-600 dark:text-emerald-300/90 hover:underline"
                                     >
                                       🔗
                                     </a>
@@ -394,17 +493,17 @@ export default function ResultView({
                             )}
                           </ul>
                         ) : (
-                          <div className="text-[11px] opacity-70">
+                          <div className="text-[11px] opacity-70 text-emerald-700 dark:text-emerald-300">
                             Data isn&apos;t available online
                           </div>
                         )}
                       </div>
-                      <div className="rounded border border-emerald-500/30 p-2">
-                        <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">
+                      <div className="rounded border border-emerald-400/40 dark:border-emerald-500/30 p-2 bg-white/50 dark:bg-transparent">
+                        <div className="text-[10px] uppercase tracking-wider text-emerald-700 dark:text-emerald-200/80 mb-1 font-semibold">
                           Market Growth
                         </div>
                         {webSearch?.market_growth?.summary ? (
-                          <div className="text-[11px]">
+                          <div className="text-[11px] text-emerald-900 dark:text-emerald-100">
                             <span className="opacity-90">
                               {webSearch.market_growth.summary}
                             </span>{" "}
@@ -413,14 +512,14 @@ export default function ResultView({
                                 href={webSearch.market_growth.source}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-emerald-300/90 hover:underline"
+                                className="text-emerald-600 dark:text-emerald-300/90 hover:underline"
                               >
                                 🔗
                               </a>
                             )}
                           </div>
                         ) : (
-                          <div className="text-[11px] opacity-70">
+                          <div className="text-[11px] opacity-70 text-emerald-700 dark:text-emerald-300">
                             Data isn&apos;t available online
                           </div>
                         )}
@@ -473,12 +572,12 @@ export default function ResultView({
                     return (
                       <div
                         key={sub}
-                        className="rounded-md bg-white/[0.02] p-2 border border-white/[0.04]"
+                        className="rounded-md bg-slate-50 dark:bg-white/[0.02] p-2 border border-slate-200 dark:border-white/[0.04]"
                       >
-                        <div className="text-[9px] uppercase tracking-wider font-semibold text-indigo-300/60 mb-1">
+                        <div className="text-xs uppercase tracking-wider font-semibold text-blue-600 dark:text-indigo-300/60 mb-1">
                           {prettyLabel}
                         </div>
-                        <div className="text-[11px] md:text-[12px] leading-relaxed whitespace-pre-wrap opacity-90">
+                        <div className="text-base md:text-lg leading-relaxed whitespace-pre-wrap opacity-90">
                           {nodeText}
                         </div>
                       </div>
@@ -498,15 +597,15 @@ export default function ResultView({
                     {items.map((h: any, i: number) => (
                       <li
                         key={i}
-                        className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2.5"
+                        className="rounded-md border border-amber-300/30 dark:border-amber-400/20 bg-amber-100/50 dark:bg-amber-400/5 p-2.5"
                       >
                         {h.claim && (
-                          <div className="font-medium text-[11px] md:text-[12px] leading-snug mb-1 text-amber-200/90">
+                          <div className="font-medium text-base md:text-lg leading-snug mb-1 text-amber-900 dark:text-amber-200/90">
                             {h.claim}
                           </div>
                         )}
                         {h.status && (
-                          <div className="text-[10px] md:text-[11px] text-amber-300/70">
+                          <div className="text-sm md:text-base text-amber-700 dark:text-amber-300/70">
                             {h.status}
                           </div>
                         )}
@@ -517,16 +616,16 @@ export default function ResultView({
               }
               if ((section as any).key === "founder_questions") {
                 return (
-                  <ol className="space-y-3 list-decimal pl-4 marker:text-indigo-300/60">
+                  <ol className="space-y-3 list-decimal pl-4 marker:text-blue-600 dark:marker:text-indigo-300/60 marker:font-semibold">
                     {items.map((q: any, i: number) => (
                       <li key={i} className="space-y-1">
                         {q.question && (
-                          <div className="font-medium text-[11px] md:text-[12px] leading-snug text-indigo-100/90">
+                          <div className="font-medium text-base md:text-lg leading-snug text-slate-900 dark:text-indigo-100/90">
                             {q.question}
                           </div>
                         )}
                         {q.rationale && (
-                          <div className="text-[10px] md:text-[11px] text-indigo-200/60">
+                          <div className="text-sm md:text-base text-slate-700 dark:text-indigo-200/60">
                             {q.rationale}
                           </div>
                         )}
@@ -536,7 +635,7 @@ export default function ResultView({
                 );
               }
               return (
-                <ul className="list-disc pl-4 space-y-1 marker:text-indigo-400/70">
+                <ul className="list-disc pl-4 space-y-1 marker:text-blue-600 dark:marker:text-indigo-400/70">
                   {items.map((v: any, i: number) => (
                     <li key={i} className="opacity-90">
                       {typeof v === "object"
@@ -567,16 +666,60 @@ export default function ResultView({
           };
           const content = renderVal();
           if (!content) return null;
+
+          const iconMap: Record<string, string> = {
+            problem:
+              "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
+            solution: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+            icp_gtm:
+              "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+            traction_bullets: "M13 7h8m0 0v8m0-8l-8 8-4-4-6 6",
+            business_model:
+              "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+            tam: "M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+            team: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z",
+            moat_bullets:
+              "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+            risks_bullets:
+              "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
+            why_now: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
+            hypotheses:
+              "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+            founder_questions:
+              "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+          };
+
           return (
             <div
               key={(section as any).key}
-              className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2.5 border border-white/5"
+              className="group p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all"
             >
-              <div className="text-[10px] uppercase font-semibold tracking-wider text-indigo-300/70 mb-1 flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
-                {(section as any).label}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow shadow-blue-500/30">
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={
+                        iconMap[(section as any).key] ||
+                        "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      }
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50 uppercase tracking-wide">
+                  {(section as any).label}
+                </h3>
               </div>
-              {content}
+              <div className="text-lg text-slate-800 dark:text-slate-200 leading-relaxed">
+                {content}
+              </div>
             </div>
           );
         })}

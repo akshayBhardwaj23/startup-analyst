@@ -60,13 +60,13 @@ export default function NavBar() {
     localStorage.setItem("theme", next ? "dark" : "light");
   };
   return (
-    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-white/10 supports-[backdrop-filter]:bg-background/40">
+    <nav className="sticky top-0 z-40 backdrop-blur-xl bg-white/70 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 supports-[backdrop-filter]:bg-white/40 supports-[backdrop-filter]:dark:bg-slate-950/40">
       <div className="max-w-6xl mx-auto px-5 h-14 flex items-center justify-between gap-4">
         {/* Left: Brand */}
         <div className="flex items-center gap-3 min-w-0">
           {/* Replace with <Image src="/brand-icon.svg" ... /> once icon added */}
           <Image src="/brand-icon.svg" alt="Logo" width={20} height={20} />
-          <span className="font-semibold tracking-tight text-sm md:text-base select-none">
+          <span className="font-semibold tracking-tight text-sm md:text-base select-none text-slate-900 dark:text-slate-100">
             Startup-Analyst-XI
           </span>
         </div>
@@ -82,9 +82,9 @@ export default function NavBar() {
                     href={l.href}
                     className={`px-3 py-2 rounded-lg transition relative block ${
                       active
-                        ? "text-indigo-400"
-                        : "opacity-75 hover:opacity-100"
-                    } hover:text-indigo-300`}
+                        ? "text-blue-600 dark:text-indigo-400"
+                        : "text-slate-600 dark:text-slate-300 opacity-75 hover:opacity-100"
+                    } hover:text-blue-700 dark:hover:text-indigo-300`}
                   >
                     {l.label}
                     {active && (
@@ -100,9 +100,9 @@ export default function NavBar() {
                   href="/history"
                   className={`px-3 py-2 rounded-lg transition relative block ${
                     pathname === "/history"
-                      ? "text-indigo-400"
-                      : "opacity-75 hover:opacity-100"
-                  } hover:text-indigo-300`}
+                      ? "text-blue-600 dark:text-indigo-400"
+                      : "text-slate-600 dark:text-slate-300 opacity-75 hover:opacity-100"
+                  } hover:text-blue-700 dark:hover:text-indigo-300`}
                 >
                   History
                   {pathname === "/history" && (
@@ -117,11 +117,11 @@ export default function NavBar() {
             onClick={toggleTheme}
             aria-label="Toggle theme"
             aria-pressed={isDark}
-            className="relative inline-flex h-7 w-14 items-center rounded-full border border-white/15 bg-white/5 hover:bg-white/10 transition focus:outline-none focus:ring-2 focus:ring-indigo-400/50"
+            className="relative inline-flex h-7 w-14 items-center rounded-full border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-indigo-400/50"
             title={isDark ? "Switch to light" : "Switch to dark"}
           >
             {/* Sun icon (left) */}
-            <span className="pointer-events-none absolute left-1 h-3.5 w-3.5 opacity-90 text-yellow-400">
+            <span className="pointer-events-none absolute left-1 h-3.5 w-3.5 opacity-90 text-amber-500">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -136,7 +136,7 @@ export default function NavBar() {
               </svg>
             </span>
             {/* Moon icon (right) */}
-            <span className="pointer-events-none absolute right-1 h-4 w-4 text-gray-400">
+            <span className="pointer-events-none absolute right-1 h-4 w-4 text-slate-600 dark:text-slate-400">
               <svg
                 viewBox="0 0 24 24"
                 fill="currentColor"

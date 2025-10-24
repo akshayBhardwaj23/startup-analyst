@@ -33,12 +33,14 @@ export default async function ResultPage({
   const brief = run.brief as any;
   const name = run.companyName || run.company?.name || "Startup";
   return (
-    <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
-      <ResultView
-        brief={brief}
-        companyName={name}
-        createdAt={run.createdAt.toISOString()}
-      />
+    <div className="min-h-screen w-full bg-white dark:bg-slate-950">
+      <div className="px-5 py-10 sm:px-8 md:px-12 fade-in">
+        <ResultView
+          brief={brief}
+          companyName={name}
+          createdAt={run.createdAt.toISOString()}
+        />
+      </div>
     </div>
   );
 }

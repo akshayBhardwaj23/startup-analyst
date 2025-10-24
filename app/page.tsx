@@ -840,182 +840,321 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full px-5 py-12 sm:px-8 md:px-12 font-sans fade-in">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-10 text-center">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">
-            Startup Brief Generator
-          </h1>
-          <p className="mt-3 text-sm max-w-2xl mx-auto text-foreground/70 leading-relaxed">
-            Drag and drop your pitch materials (PDF or DOCX) to generate a
-            concise, investor-style brief with one-liner, problem, solution,
-            GTM, TAM, team, risks and more.
-          </p>
-        </div>
+    <div className="min-h-screen w-full fade-in">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-white dark:bg-slate-950">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-slate-50/30 dark:from-slate-900/50 dark:via-transparent dark:to-slate-900/30" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-blue-600/5 dark:from-blue-500/5 dark:to-blue-600/3 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-slate-300/8 to-blue-400/8 dark:from-slate-700/5 dark:to-blue-500/5 rounded-full blur-3xl" />
 
-        <section className="panel glass relative overflow-hidden">
-          <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-gradient-to-tr from-indigo-500/20 via-fuchsia-500/20 to-pink-500/20 blur-3xl" />
-          <div className="relative space-y-6">
-            <div>
-              <div className="card-title">Upload</div>
-              <div
-                ref={dropRef}
-                onDragEnter={onDrag}
-                onDragOver={onDrag}
-                onDragLeave={onDrag}
-                onDrop={onDrop}
-                className={`file-drop ${dragActive ? "drag-active" : ""}`}
-              >
-                <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  onChange={(e) => handleFiles(e.target.files)}
-                  disabled={analyzing}
-                />
-                <div className="flex flex-col items-center gap-2 text-sm">
-                  <span className="font-medium">
-                    {dragActive
-                      ? "Release to add"
-                      : "Drag & drop or click to select"}
-                  </span>
-                  <span className="text-xs opacity-70">
-                    PDF or DOCX • up to ~25MB each
-                  </span>
-                  {totalFiles > 0 && (
-                    <span className="mt-1 outline-pill">
-                      {totalFiles} file{totalFiles > 1 ? "s" : ""} selected
-                    </span>
-                  )}
-                </div>
-              </div>
-              {totalFiles > 0 && (
-                <ul className="mt-4 space-y-1 max-h-40 overflow-auto pr-1 text-xs">
-                  {files.map((file, idx) => (
-                    <li
-                      key={`${file.name}-${idx}`}
-                      className="flex items-center gap-2 py-1 px-2 rounded-md bg-indigo-500/5 border border-indigo-500/10"
-                    >
-                      <span className="i-tabler-file-description text-indigo-400" />
-                      <span className="truncate flex-1" title={file.name}>
-                        {file.name}
-                      </span>
-                      <button
-                        onClick={() => removeFileAt(idx)}
-                        className="ml-2 inline-flex items-center justify-center h-6 w-6 rounded hover:bg-white/10 text-red-400"
-                        aria-label={`Remove ${file.name}`}
-                        title="Remove file"
-                      >
+        <div className="relative max-w-6xl mx-auto px-5 py-16 sm:px-8 md:px-12 sm:py-24">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-700/40 mb-6">
+              <span
+                className="w-2 h-2 rounded-full animate-pulse flex-shrink-0"
+                style={{ backgroundColor: "#22c55e" }}
+              />
+              <span className="text-sm font-semibold text-blue-900 dark:text-blue-200">
+                Powered by Gemini AI
+              </span>
+            </div>
+
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-6">
+              <span className="text-slate-900 dark:text-white">
+                Startup Brief Generator
+              </span>
+            </h1>
+
+            <p className="text-xl sm:text-2xl max-w-3xl mx-auto text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
+              Transform pitch decks into investor-ready briefs with AI-powered
+              analysis
+            </p>
+          </div>
+
+          {/* Main Upload Card */}
+          <div className="max-w-3xl mx-auto">
+            <div className="panel glass relative overflow-hidden shadow-2xl">
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-gradient-to-br from-blue-500/15 to-blue-600/10 rounded-full blur-3xl" />
+
+              <div className="relative space-y-8">
+                {/* Upload Section */}
+                <div>
+                  <label className="block text-base font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                    Upload Documents
+                  </label>
+                  <div
+                    ref={dropRef}
+                    onDragEnter={onDrag}
+                    onDragOver={onDrag}
+                    onDragLeave={onDrag}
+                    onDrop={onDrop}
+                    className={`file-drop ${dragActive ? "drag-active" : ""}`}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={(e) => handleFiles(e.target.files)}
+                      disabled={analyzing}
+                    />
+                    <div className="flex flex-col items-center gap-3 py-4">
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
                         <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          width="16"
-                          height="16"
+                          className="w-8 h-8 text-white"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-base font-semibold text-slate-800 dark:text-slate-100 mb-1">
+                          {dragActive
+                            ? "Drop files here"
+                            : "Drag & drop or click to browse"}
+                        </p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          PDF or DOCX • up to 25MB each
+                        </p>
+                      </div>
+                      {totalFiles > 0 && (
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-700/40">
+                          <span className="text-sm font-bold text-blue-700 dark:text-blue-300">
+                            {totalFiles} file{totalFiles > 1 ? "s" : ""}{" "}
+                            selected
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {totalFiles > 0 && (
+                    <div className="mt-4 space-y-2 max-h-40 overflow-auto">
+                      {files.map((file, idx) => (
+                        <div
+                          key={`${file.name}-${idx}`}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 hover:border-blue-300 dark:hover:border-blue-600 transition-colors"
+                        >
+                          <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shadow shadow-blue-500/30">
+                            <svg
+                              className="w-5 h-5 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                              />
+                            </svg>
+                          </div>
+                          <span
+                            className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200 truncate"
+                            title={file.name}
+                          >
+                            {file.name}
+                          </span>
+                          <button
+                            onClick={() => removeFileAt(idx)}
+                            className="flex-shrink-0 w-8 h-8 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500 flex items-center justify-center transition-colors"
+                            aria-label={`Remove ${file.name}`}
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Company Name Section */}
+                <div>
+                  <label className="block text-base font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    placeholder="e.g., Acme Corp"
+                    className="w-full px-4 py-3.5 text-base font-medium rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-900 dark:text-slate-100 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all company-input"
+                    aria-required
+                  />
+                </div>
+
+                {/* Generate Button */}
+                <button
+                  onClick={onAnalyze}
+                  disabled={
+                    analyzing ||
+                    !files ||
+                    files.length === 0 ||
+                    !companyName.trim()
+                  }
+                  className="w-full btn-primary text-base py-4 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {analyzing ? (
+                    <span className="flex items-center gap-3">
+                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Generating Analysis...
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                        >
-                          <line x1="18" y1="6" x2="6" y2="18" />
-                          <line x1="6" y1="6" x2="18" y2="18" />
-                        </svg>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+                          strokeWidth={2}
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                      {session ? "Generate Brief" : "Sign In to Generate"}
+                    </span>
+                  )}
+                </button>
 
-            <div>
-              <div className="card-title">Company</div>
-              <input
-                type="text"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                placeholder="Write Company Name here"
-                className="w-full rounded-xl border border-indigo-500/25 bg-indigo-500/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400/60 transition"
-                aria-required
-              />
-              <div className="mt-1 text-[11px] opacity-70">
-                Company name is required to generate the brief.
+                {error && (
+                  <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                    <p className="text-sm text-red-600 dark:text-red-400 font-medium">
+                      {error}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={onAnalyze}
-                disabled={
-                  analyzing ||
-                  !files ||
-                  files.length === 0 ||
-                  !companyName.trim()
-                }
-                className="btn-primary text-sm"
-                title={
-                  !session
-                    ? "Login to generate brief"
-                    : !companyName.trim()
-                    ? "Enter company name"
-                    : undefined
-                }
-              >
-                {analyzing ? (
-                  <span className="flex items-center gap-2">
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Generating…
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <span>
-                      {session ? "Generate Brief" : "Login to Generate"}
-                    </span>
-                  </span>
-                )}
-              </button>
-              {error && (
-                <span className="text-xs text-red-500 font-medium">
-                  {error}
-                </span>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <div className="mt-10 grid gap-4 sm:grid-cols-3 text-xs opacity-80">
-          <div className="rounded-md border border-white/10 bg-white/[0.03] p-3">
-            <div className="font-semibold mb-1">Private by default</div>
-            <div>
-              Files are uploaded securely and processed transiently for
-              analysis.
-            </div>
-          </div>
-          <div className="rounded-md border border-white/10 bg-white/[0.03] p-3">
-            <div className="font-semibold mb-1">Actionable output</div>
-            <div>
-              Clear sections on ICP, GTM, TAM, team, risks, hypotheses and more.
-            </div>
-          </div>
-          <div className="rounded-md border border-white/10 bg-white/[0.03] p-3">
-            <div className="font-semibold mb-1">Sharable</div>
-            <div>Download a polished PDF or revisit results anytime.</div>
           </div>
         </div>
-
-        <footer className="mt-14 mb-4 text-center text-[11px] opacity-60 space-y-1">
-          <div>
-            Built for rapid diligence workflows. Documents are processed
-            transiently.
-          </div>
-          <div>
-            © Token Tribe • Loading may be slow depending on region/network.
-          </div>
-        </footer>
       </div>
 
+      {/* Features Section */}
+      <div className="max-w-6xl mx-auto px-5 py-16 sm:px-8 md:px-12 bg-white dark:bg-slate-950">
+        <div className="grid sm:grid-cols-3 gap-6">
+          <div className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow shadow-blue-500/30">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
+              Private & Secure
+            </h3>
+            <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+              Files are processed transiently with enterprise-grade security.
+              Your data is never stored.
+            </p>
+          </div>
+
+          <div className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow shadow-slate-500/30">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
+              Investor-Ready
+            </h3>
+            <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+              Get comprehensive analysis with ICP, GTM, TAM, risks, team
+              assessment and more.
+            </p>
+          </div>
+
+          <div className="group p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-blue-300 dark:hover:border-blue-600 transition-all hover:shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow shadow-emerald-500/30">
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"
+                />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-50 mb-2">
+              Export & Share
+            </h3>
+            <p className="text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+              Download polished PDF reports or share results with your team
+              instantly.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 dark:border-slate-800 py-8 bg-white dark:bg-slate-950">
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 md:px-12 text-center">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Built for rapid diligence workflows •{" "}
+            <span className="font-medium">© Token Tribe</span>
+          </p>
+        </div>
+      </footer>
+
+      {/* Loading Overlay */}
       {analyzing && (
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute inset-0 animate-pulse opacity-5 bg-gradient-to-br from-indigo-500 via-fuchsia-500 to-pink-500" />
+        <div className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-2xl max-w-sm mx-4">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-500 to-fuchsia-500 flex items-center justify-center">
+              <span className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+            </div>
+            <h3 className="text-lg font-semibold text-center text-slate-800 dark:text-slate-100 mb-2">
+              Analyzing Documents
+            </h3>
+            <p className="text-sm text-center text-slate-600 dark:text-slate-400">
+              This may take a minute...
+            </p>
+          </div>
         </div>
       )}
     </div>
