@@ -248,16 +248,13 @@ export default function ResultView({
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 mb-6">
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-700/40 mb-4">
-              <span
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                style={{ backgroundColor: "#10b981" }}
-              ></span>
+              <span className="status-dot"></span>
               <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
                 Analysis Complete
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-slate-50 mb-2">
-              {companyName}
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-2">
+              <span className="gradient-text">{companyName}</span>
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Generated{" "}
@@ -695,9 +692,9 @@ export default function ResultView({
               className="group p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-blue-400 dark:hover:border-blue-600 hover:shadow-md transition-all"
             >
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow shadow-blue-500/30">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 gradient-icon">
                   <svg
-                    className="w-4 h-4 text-white"
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -713,7 +710,7 @@ export default function ResultView({
                     />
                   </svg>
                 </div>
-                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-50 uppercase tracking-wide">
+                <h3 className="text-sm font-bold uppercase tracking-wide gradient-text">
                   {(section as any).label}
                 </h3>
               </div>

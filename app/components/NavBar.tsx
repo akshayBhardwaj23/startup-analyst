@@ -66,7 +66,7 @@ export default function NavBar() {
         <div className="flex items-center gap-3 min-w-0">
           {/* Replace with <Image src="/brand-icon.svg" ... /> once icon added */}
           <Image src="/brand-icon.svg" alt="Logo" width={20} height={20} />
-          <span className="font-semibold tracking-tight text-sm md:text-base select-none text-slate-900 dark:text-slate-100">
+          <span className="font-semibold tracking-tight text-sm md:text-base select-none text-gray-800 dark:text-gray-200">
             Startup-Analyst-XI
           </span>
         </div>
@@ -82,9 +82,9 @@ export default function NavBar() {
                     href={l.href}
                     className={`px-3 py-2 rounded-lg transition relative block ${
                       active
-                        ? "text-blue-600 dark:text-indigo-400"
-                        : "text-slate-600 dark:text-slate-300 opacity-75 hover:opacity-100"
-                    } hover:text-blue-700 dark:hover:text-indigo-300`}
+                        ? "text-gray-900 dark:text-gray-100"
+                        : "text-gray-600 dark:text-gray-400 opacity-75 hover:opacity-100"
+                    } hover:text-gray-800 dark:hover:text-gray-200`}
                   >
                     {l.label}
                     {active && (
@@ -100,9 +100,9 @@ export default function NavBar() {
                   href="/history"
                   className={`px-3 py-2 rounded-lg transition relative block ${
                     pathname === "/history"
-                      ? "text-blue-600 dark:text-indigo-400"
-                      : "text-slate-600 dark:text-slate-300 opacity-75 hover:opacity-100"
-                  } hover:text-blue-700 dark:hover:text-indigo-300`}
+                      ? "text-gray-900 dark:text-gray-100"
+                      : "text-gray-600 dark:text-gray-400 opacity-75 hover:opacity-100"
+                  } hover:text-gray-800 dark:hover:text-gray-200`}
                 >
                   History
                   {pathname === "/history" && (
