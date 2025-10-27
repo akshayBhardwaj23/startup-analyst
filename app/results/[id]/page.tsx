@@ -2,7 +2,6 @@
 import { useState, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 const ChatDrawer = dynamic(() => import("../../components/ChatDrawer"), {
   ssr: false,
@@ -36,9 +35,6 @@ function Gauge({
   const cx = width / 2;
   const cy = height - 6; // add padding to avoid clipping the stroke
   const r = Math.round(baseR * scale);
-
-  const angleFor = (s: number) => Math.PI - (s / 100) * Math.PI; // pi -> 0 (left -> right)
-  const endAngle = safe != null ? angleFor(safe) : Math.PI;
 
   const startX = cx - r;
   const startY = cy;
@@ -132,7 +128,6 @@ function Gauge({
 export default function ResultsPage() {
   const params = useParams();
   const router = useRouter();
-  const { data: session } = useSession();
   const [brief, setBrief] = useState<Brief | null>(null);
   const [webSearch, setWebSearch] = useState<any | null>(null);
   const [companyName, setCompanyName] = useState("");
@@ -175,47 +170,6 @@ export default function ResultsPage() {
 
     fetchResults();
   }, [id, router]);
-
-  const formatBriefToText = (b: any) => {
-    if (!b) return "";
-    const lines: string[] = [];
-    const add = (label: string, value: any) => {
-      if (value == null) return;
-      if (Array.isArray(value)) {
-        if (value.length === 0) return;
-        lines.push(`${label}:`);
-        for (const item of value) {
-          const text =
-            typeof item === "object" ? JSON.stringify(item) : String(item);
-          lines.push(`- ${text}`);
-        }
-      } else if (typeof value === "object") {
-        lines.push(`${label}:`);
-        lines.push(JSON.stringify(value, null, 2));
-      } else {
-        lines.push(`${label}: ${String(value)}`);
-      }
-      lines.push("");
-    };
-
-    add("One-liner", b.one_liner);
-    add("Problem", b.problem);
-    add("Solution", b.solution);
-    add("ICP & GTM", b.icp_gtm);
-    add("Traction", b.traction_bullets);
-    add("Business model", b.business_model);
-    add("TAM", b.tam);
-    add("Team", b.team);
-    add("Moat", b.moat_bullets);
-    add("Risks", b.risks_bullets);
-    add("Ansoff Matrix", b.ansoff_matrix);
-    add("Why now", b.why_now);
-    add("Hypotheses", b.hypotheses);
-    add("Founder questions", b.founder_questions);
-    add("Ratings", b.ratings);
-
-    return lines.join("\n").trim();
-  };
 
   // Build a custom multi-page A4 PDF (no screenshot) with a two-column layout
   const onDownloadPDF = useCallback(async () => {
@@ -302,7 +256,7 @@ export default function ResultsPage() {
       }
 
       // Divider under header
-      (pdf as any).setLineCap && (pdf as any).setLineCap("butt");
+      if ((pdf as any).setLineCap) (pdf as any).setLineCap("butt");
       pdf.setDrawColor(230, 230, 235);
       pdf.setLineWidth(0.8);
       pdf.line(
@@ -326,13 +280,10 @@ export default function ResultsPage() {
         cap: "butt" | "round" | "square" = "round"
       ) => {
         const [r, g, b] = hexToRgb(hex);
-        (pdf as any).setLineCap && (pdf as any).setLineCap(cap);
+        if ((pdf as any).setLineCap) (pdf as any).setLineCap(cap);
         pdf.setDrawColor(r, g, b);
         pdf.setLineWidth(w);
       };
-      const textColor = (pdf as any).getTextColor
-        ? (pdf as any).getTextColor()
-        : undefined;
 
       const gaugeColorFor = (score: number | null | undefined) => {
         if (score == null) return "#94a3b8"; // slate-400
@@ -783,18 +734,6 @@ export default function ResultsPage() {
       setError("Failed to generate PDF");
     }
   }, [brief, companyName, webSearch]);
-
-  // Safely coerce possible array / object fields to display text
-  const toLines = (value: any): string => {
-    if (Array.isArray(value))
-      return value
-        .map((v) => (typeof v === "object" ? JSON.stringify(v) : String(v)))
-        .join("\n");
-    if (value && typeof value === "object")
-      return JSON.stringify(value, null, 2);
-    if (value == null) return "";
-    return String(value);
-  };
 
   if (loading) {
     return (
