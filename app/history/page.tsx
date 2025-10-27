@@ -7,9 +7,31 @@ export default async function HistoryPage() {
   const session = (await getServerSession(authOptions as any)) as any;
   if (!session?.user) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center px-5">
-        <div className="text-sm opacity-80">
-          Please sign in to view your history.
+      <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
+        <div className="max-w-4xl mx-auto">
+          <div className="panel glass text-center py-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mx-auto mb-4 opacity-40"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            <p className="text-sm opacity-80 mb-4">
+              Please sign in to view your history.
+            </p>
+            <Link href="/login" className="btn-primary">
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -21,34 +43,110 @@ export default async function HistoryPage() {
     include: { runs: { orderBy: { createdAt: "desc" }, take: 1 } },
   });
   return (
-    <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12">
+    <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-semibold tracking-tight mb-6">History</h1>
-        <ul className="space-y-3">
-          {companies.map((c: any) => (
-            <li
-              key={c.id}
-              className="rounded-md border border-white/10 p-3 bg-white/5"
+        <header className="mb-8">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">
+            Analysis History
+          </h1>
+          <p className="mt-2 text-sm text-foreground/70">
+            View all your previous company analyses
+          </p>
+        </header>
+
+        {companies.length === 0 ? (
+          <div className="panel glass text-center py-12">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mx-auto mb-4 opacity-40"
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{c.name}</div>
-                  {c.runs[0] && (
-                    <div className="text-xs opacity-70">
-                      Last run: {new Date(c.runs[0].createdAt).toLocaleString()}
-                    </div>
-                  )}
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+            <p className="text-sm opacity-70 mb-4">No analyses yet</p>
+            <Link href="/" className="btn-primary">
+              Generate Your First Brief
+            </Link>
+          </div>
+        ) : (
+          <div className="grid gap-3">
+            {companies.map((c: any) => (
+              <Link
+                key={c.id}
+                href={`/history/${c.id}`}
+                className="group rounded-lg border border-white/10 p-4 bg-white/[0.02] hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-indigo-400"
+                    >
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                      <circle cx="9" cy="7" r="4" />
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-base mb-1">{c.name}</div>
+                    {c.runs[0] && (
+                      <div className="text-xs opacity-60">
+                        Last analysis:{" "}
+                        {new Date(c.runs[0].createdAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          }
+                        )}{" "}
+                        at{" "}
+                        {new Date(c.runs[0].createdAt).toLocaleTimeString(
+                          "en-US",
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <Link
-                  href={`/history/${c.id}`}
-                  className="text-xs px-3 py-1.5 rounded bg-indigo-500/20 border border-indigo-500/30 hover:bg-indigo-500/30"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
                 >
-                  View
-                </Link>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
