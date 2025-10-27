@@ -263,5 +263,9 @@ Documents:\n${chunks}`;
     select: { id: true, createdAt: true, brief: true },
   });
 
-  return NextResponse.json({ brief: parsed, previousRuns: previous });
+  return NextResponse.json({
+    brief: parsed,
+    previousRuns: previous,
+    runId: run.id,
+  });
 }
