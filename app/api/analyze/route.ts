@@ -172,6 +172,8 @@ export async function POST(req: NextRequest) {
 
   const prompt = `You are a VC analyst. Produce ONLY valid JSON (no markdown fences, no commentary) matching EXACTLY this schema used by the UI:
 {
+  "industry": "FinTech|HealthTech|EdTech|PropTech|CleanTech|AgTech|FoodTech|RetailTech|Enterprise SaaS|Consumer|Marketplace|AI/ML|Cybersecurity|DeepTech|Other",
+  "stage": "Idea|Pre-seed|Seed|Series A|Series B|Series C+|Growth|Other",
   "one_liner": {"text":"...","refs":["file.pdf"]},
   "problem": {"text":"...","refs":[...]},
   "solution": {"text":"...","refs":[...]},
@@ -208,6 +210,8 @@ export async function POST(req: NextRequest) {
 }
 
 Rules:
+- **Industry**: Categorize the startup into one of the provided industries based on their product/service. Examples: FinTech (financial services), HealthTech (healthcare), EdTech (education), PropTech (real estate), CleanTech (sustainability), Enterprise SaaS (B2B software), AI/ML (artificial intelligence focus), etc. Use "Other" if none fit.
+- **Stage**: Determine the funding/development stage based on traction, team size, revenue mentioned in docs. "Idea" (concept only), "Pre-seed" (early prototype), "Seed" (MVP/early users), "Series A" (product-market fit), "Series B+" (scaling), "Growth" (mature). Use "Other" if unclear.
 - Use ONLY information in the provided documents.
 - If a factual/metric/market size/traction/claim lacks direct evidence in the docs, DO NOT include it in normal sections; instead add an entry to hypotheses with status "NO-EVIDENCE: <brief reason>". Supported claims may use status "SUPPORTED" (optional) or omit status for normal bullets.
 - Each narrative object MUST have a "text" string and a "refs" array listing source doc names that support that statement. If multiple sentences share refs you can repeat refs.
@@ -281,6 +285,8 @@ Documents:\n${chunks}`;
       brief: parsed as any,
       fileUrls: urls as any,
       fileNames: names as any,
+      industry: (parsed as any)?.industry || null,
+      stage: (parsed as any)?.stage || null,
     },
   });
 

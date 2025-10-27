@@ -84,6 +84,8 @@ model AnalysisRun {
   brief        Json
   fileUrls     Json?
   fileNames    Json?
+  industry     String?
+  stage        String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 

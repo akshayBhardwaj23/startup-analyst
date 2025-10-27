@@ -132,6 +132,8 @@ export default function ResultsPage() {
   const [webSearch, setWebSearch] = useState<any | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [createdAt, setCreatedAt] = useState<string | null>(null);
+  const [industry, setIndustry] = useState<string | null>(null);
+  const [stage, setStage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -161,6 +163,8 @@ export default function ResultsPage() {
         setBrief(data.brief);
         setCompanyName(data.companyName || "");
         setCreatedAt(data.createdAt || null);
+        setIndustry(data.industry || null);
+        setStage(data.stage || null);
         setWebSearch(data.webSearch || null);
         setPreviousRuns(data.previousRuns || null);
       } catch (e: any) {
@@ -825,6 +829,62 @@ export default function ResultsPage() {
               <h2 className="text-lg font-semibold tracking-tight">
                 VC Style Summary
               </h2>
+              {(industry || stage) && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {industry && (
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-300 cursor-help"
+                      title="Industry Category"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="2"
+                          y="7"
+                          width="20"
+                          height="14"
+                          rx="2"
+                          ry="2"
+                        />
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                      </svg>
+                      {industry}
+                    </span>
+                  )}
+                  {stage && (
+                    <span
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-300 cursor-help"
+                      title="Funding Stage"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="13"
+                        height="13"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="12" y1="20" x2="12" y2="10" />
+                        <line x1="18" y1="20" x2="18" y2="4" />
+                        <line x1="6" y1="20" x2="6" y2="16" />
+                      </svg>
+                      {stage}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
             {brief && (
               <div className="flex items-center gap-2" data-noexport="true">

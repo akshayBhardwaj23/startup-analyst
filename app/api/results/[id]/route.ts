@@ -45,6 +45,8 @@ export async function GET(
       fileNames: true,
       createdAt: true,
       companyId: true,
+      industry: true,
+      stage: true,
     },
   });
 
@@ -70,6 +72,8 @@ export async function GET(
     brief: run.brief,
     companyName: run.companyName,
     createdAt: run.createdAt,
+    industry: run.industry,
+    stage: run.stage,
     webSearch: null, // Could be fetched again if needed
     previousRuns: previous,
   });

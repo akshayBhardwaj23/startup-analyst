@@ -40,7 +40,13 @@ export default async function HistoryPage() {
   const companies = await prisma.company.findMany({
     where: { userId },
     orderBy: { updatedAt: "desc" },
-    include: { runs: { orderBy: { createdAt: "desc" }, take: 1 } },
+    include: {
+      runs: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { createdAt: true, industry: true, stage: true },
+      },
+    },
   });
   return (
     <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
@@ -107,25 +113,81 @@ export default async function HistoryPage() {
                   <div>
                     <div className="font-semibold text-base mb-1">{c.name}</div>
                     {c.runs[0] && (
-                      <div className="text-xs opacity-60">
-                        Last analysis:{" "}
-                        {new Date(c.runs[0].createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          }
-                        )}{" "}
-                        at{" "}
-                        {new Date(c.runs[0].createdAt).toLocaleTimeString(
-                          "en-US",
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}
-                      </div>
+                      <>
+                        <div className="flex flex-wrap gap-1.5 mb-1.5">
+                          {c.runs[0].industry && (
+                            <span
+                              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-300 cursor-help"
+                              title="Industry Category"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect
+                                  x="2"
+                                  y="7"
+                                  width="20"
+                                  height="14"
+                                  rx="2"
+                                  ry="2"
+                                />
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                              </svg>
+                              {c.runs[0].industry}
+                            </span>
+                          )}
+                          {c.runs[0].stage && (
+                            <span
+                              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-300 cursor-help"
+                              title="Funding Stage"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <line x1="12" y1="20" x2="12" y2="10" />
+                                <line x1="18" y1="20" x2="18" y2="4" />
+                                <line x1="6" y1="20" x2="6" y2="16" />
+                              </svg>
+                              {c.runs[0].stage}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs opacity-60">
+                          Last analysis:{" "}
+                          {new Date(c.runs[0].createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            }
+                          )}{" "}
+                          at{" "}
+                          {new Date(c.runs[0].createdAt).toLocaleTimeString(
+                            "en-US",
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

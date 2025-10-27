@@ -47,7 +47,12 @@ export async function GET(
   const runs = await prisma.analysisRun.findMany({
     where: { companyId: company.id, userId },
     orderBy: { createdAt: "desc" },
-    select: { id: true, createdAt: true },
+    select: {
+      id: true,
+      createdAt: true,
+      industry: true,
+      stage: true,
+    },
   });
 
   return NextResponse.json({
