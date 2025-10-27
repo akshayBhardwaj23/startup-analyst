@@ -1137,6 +1137,8 @@ export default function ResultsPage() {
                           nested: ["global_market", "target_segment", "growth"],
                         },
                         { key: "team", label: "Team" },
+                        { key: "founders", label: "Founders" },
+                        { key: "contact_info", label: "Contact Information" },
                         {
                           key: "moat_bullets",
                           label: "Moat / Defensibility",
@@ -1357,6 +1359,203 @@ export default function ResultsPage() {
                                 </ol>
                               );
                             }
+                            // Risks: objects with text, severity, refs
+                            if (section.key === "risks_bullets") {
+                              return (
+                                <ul className="space-y-2">
+                                  {items.map((risk: any, i: number) => {
+                                    const severity =
+                                      risk.severity?.toUpperCase() || "MEDIUM";
+                                    const severityConfig = {
+                                      HIGH: {
+                                        bg: "bg-red-500/10",
+                                        border: "border-red-500/30",
+                                        text: "text-red-200",
+                                        icon: "text-red-400",
+                                      },
+                                      MEDIUM: {
+                                        bg: "bg-amber-500/10",
+                                        border: "border-amber-500/30",
+                                        text: "text-amber-200",
+                                        icon: "text-amber-400",
+                                      },
+                                      LOW: {
+                                        bg: "bg-yellow-500/10",
+                                        border: "border-yellow-500/30",
+                                        text: "text-yellow-200",
+                                        icon: "text-yellow-400",
+                                      },
+                                    };
+                                    const config =
+                                      severityConfig[
+                                        severity as keyof typeof severityConfig
+                                      ] || severityConfig.MEDIUM;
+                                    const riskText =
+                                      typeof risk === "object"
+                                        ? risk.text
+                                        : String(risk);
+
+                                    return (
+                                      <li
+                                        key={i}
+                                        className={`rounded-md border ${config.border} ${config.bg} p-3 flex items-start gap-2.5`}
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          width="18"
+                                          height="18"
+                                          viewBox="0 0 24 24"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          strokeWidth="2"
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          className={`flex-shrink-0 mt-0.5 ${config.icon}`}
+                                        >
+                                          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                                          <line
+                                            x1="12"
+                                            y1="9"
+                                            x2="12"
+                                            y2="13"
+                                          />
+                                          <line
+                                            x1="12"
+                                            y1="17"
+                                            x2="12.01"
+                                            y2="17"
+                                          />
+                                        </svg>
+                                        <div className="flex-1">
+                                          <div
+                                            className={`font-medium text-sm md:text-base leading-snug ${config.text}`}
+                                          >
+                                            {riskText}
+                                          </div>
+                                          {severity && (
+                                            <div
+                                              className={`text-xs mt-1 font-semibold uppercase tracking-wider opacity-70`}
+                                            >
+                                              {severity} Risk
+                                            </div>
+                                          )}
+                                        </div>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              );
+                            }
+                            // Founders: display founder cards with contact info
+                            if (section.key === "founders") {
+                              return (
+                                <div className="grid gap-3">
+                                  {items.map((founder: any, i: number) => (
+                                    <div
+                                      key={i}
+                                      className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-4"
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="20"
+                                            height="20"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-indigo-300"
+                                          >
+                                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                                            <circle cx="12" cy="7" r="4" />
+                                          </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                          {founder.name && (
+                                            <div className="font-semibold text-base text-indigo-100 mb-0.5">
+                                              {founder.name}
+                                            </div>
+                                          )}
+                                          {founder.role && (
+                                            <div className="text-sm text-indigo-300/80 mb-2">
+                                              {founder.role}
+                                            </div>
+                                          )}
+                                          {founder.background && (
+                                            <div className="text-sm opacity-90 mb-2 leading-relaxed">
+                                              {founder.background}
+                                            </div>
+                                          )}
+                                          <div className="flex flex-wrap gap-2 mt-2">
+                                            {founder.email && (
+                                              <a
+                                                href={`mailto:${founder.email}`}
+                                                className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/20 transition-colors"
+                                              >
+                                                <svg
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  width="12"
+                                                  height="12"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                >
+                                                  <rect
+                                                    width="20"
+                                                    height="16"
+                                                    x="2"
+                                                    y="4"
+                                                    rx="2"
+                                                  />
+                                                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                                </svg>
+                                                {founder.email}
+                                              </a>
+                                            )}
+                                            {founder.linkedin && (
+                                              <a
+                                                href={founder.linkedin}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/30 text-blue-300 hover:bg-blue-500/20 transition-colors"
+                                              >
+                                                <svg
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  width="12"
+                                                  height="12"
+                                                  viewBox="0 0 24 24"
+                                                  fill="none"
+                                                  stroke="currentColor"
+                                                  strokeWidth="2"
+                                                  strokeLinecap="round"
+                                                  strokeLinejoin="round"
+                                                >
+                                                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                                                  <rect
+                                                    width="4"
+                                                    height="12"
+                                                    x="2"
+                                                    y="9"
+                                                  />
+                                                  <circle cx="4" cy="4" r="2" />
+                                                </svg>
+                                                LinkedIn
+                                              </a>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            }
                             return (
                               <ul className="list-disc pl-4 space-y-1 marker:text-indigo-400/70">
                                 {items.map((v: any, i: number) => (
@@ -1367,6 +1566,149 @@ export default function ResultsPage() {
                                   </li>
                                 ))}
                               </ul>
+                            );
+                          }
+                          // Contact Info: special rendering
+                          if (
+                            section.key === "contact_info" &&
+                            typeof val === "object"
+                          ) {
+                            const hasAnyContact =
+                              val.email ||
+                              val.phone ||
+                              val.website ||
+                              val.location;
+                            if (!hasAnyContact) return null;
+                            return (
+                              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  {val.email && (
+                                    <div className="flex items-start gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                                      >
+                                        <rect
+                                          width="20"
+                                          height="16"
+                                          x="2"
+                                          y="4"
+                                          rx="2"
+                                        />
+                                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                                      </svg>
+                                      <div>
+                                        <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
+                                          Email
+                                        </div>
+                                        <a
+                                          href={`mailto:${val.email}`}
+                                          className="text-sm text-emerald-200 hover:underline break-all"
+                                        >
+                                          {val.email}
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {val.phone && (
+                                    <div className="flex items-start gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                                      >
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+                                      </svg>
+                                      <div>
+                                        <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
+                                          Phone
+                                        </div>
+                                        <a
+                                          href={`tel:${val.phone}`}
+                                          className="text-sm text-emerald-200 hover:underline"
+                                        >
+                                          {val.phone}
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {val.website && (
+                                    <div className="flex items-start gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                                      >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <line x1="2" x2="22" y1="12" y2="12" />
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                                      </svg>
+                                      <div>
+                                        <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
+                                          Website
+                                        </div>
+                                        <a
+                                          href={val.website}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-emerald-200 hover:underline break-all"
+                                        >
+                                          {val.website}
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {val.location && (
+                                    <div className="flex items-start gap-2">
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="text-emerald-400 mt-0.5 flex-shrink-0"
+                                      >
+                                        <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+                                        <circle cx="12" cy="10" r="3" />
+                                      </svg>
+                                      <div>
+                                        <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
+                                          Location
+                                        </div>
+                                        <div className="text-sm text-emerald-200">
+                                          {val.location}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             );
                           }
                           // Ansoff Matrix: special rendering with component

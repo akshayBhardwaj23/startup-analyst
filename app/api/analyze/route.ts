@@ -189,8 +189,25 @@ export async function POST(req: NextRequest) {
     "growth": {"text":"...","refs":[...]}
   },
   "team": {"text":"...","refs":[...]},
+  "founders": [
+    {
+      "name": "...",
+      "role": "...",
+      "background": "...",
+      "linkedin": "...",
+      "email": "...",
+      "refs": [...]
+    }
+  ],
+  "contact_info": {
+    "email": "...",
+    "phone": "...",
+    "website": "...",
+    "location": "...",
+    "refs": [...]
+  },
   "moat_bullets": [ {"text":"...","refs":[...]}, ... ],
-  "risks_bullets": [ {"text":"...","refs":[...]}, ... ],
+  "risks_bullets": [ {"text":"...","severity":"LOW|MEDIUM|HIGH","refs":[...]}, ... ],
   "ansoff_matrix": {
     "quadrant": "MARKET_PENETRATION|MARKET_DEVELOPMENT|PRODUCT_DEVELOPMENT|DIVERSIFICATION",
     "rationale": {"text":"...","refs":[...]}
@@ -216,7 +233,10 @@ Rules:
 - If a factual/metric/market size/traction/claim lacks direct evidence in the docs, DO NOT include it in normal sections; instead add an entry to hypotheses with status "NO-EVIDENCE: <brief reason>". Supported claims may use status "SUPPORTED" (optional) or omit status for normal bullets.
 - Each narrative object MUST have a "text" string and a "refs" array listing source doc names that support that statement. If multiple sentences share refs you can repeat refs.
 - Team: If absolutely no team/founder info exists in the documents, set team.text to "UNSPECIFIED: No team information in provided documents." (leave refs as []). Do NOT fabricate or guess.
+- **Founders**: Extract individual founder details from documents - name, role/title, background/experience, LinkedIn URL, and email if available. If no founder info exists, use empty array []. Do NOT fabricate.
+- **Contact Info**: Extract company contact details - general email, phone, website URL, and location/address from documents. Leave fields empty ("") if not found. Do NOT fabricate.
 - Bullet arrays (traction_bullets, moat_bullets, risks_bullets) = objects with text + refs.
+- **Risks severity**: Each risk must include a "severity" field: "HIGH" (critical/existential risks), "MEDIUM" (significant concerns), "LOW" (minor/manageable issues).
 - Ansoff Matrix Analysis:
   - Determine which quadrant the product/strategy fits: MARKET_PENETRATION (existing product, existing market), MARKET_DEVELOPMENT (existing product, new market), PRODUCT_DEVELOPMENT (new product, existing market), or DIVERSIFICATION (new product, new market).
   - Provide rationale explaining why this quadrant applies based on evidence in documents.
