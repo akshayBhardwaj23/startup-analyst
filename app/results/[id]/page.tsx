@@ -875,7 +875,7 @@ export default function ResultsPage() {
                 ) : (
                   <div className="space-y-6">
                     {brief.one_liner && (
-                      <div className="text-base md:text-lg font-semibold tracking-tight leading-snug bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
+                      <div className="text-lg md:text-xl font-semibold tracking-tight leading-snug bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-pink-300 bg-clip-text text-transparent">
                         {typeof brief.one_liner === "object"
                           ? brief.one_liner.text ||
                             JSON.stringify(brief.one_liner)
@@ -1055,7 +1055,7 @@ export default function ResultsPage() {
                         {/* Rationale removed by request */}
                       </div>
                     )}
-                    <div className="grid gap-5 md:gap-6 text-[11px] md:text-[13px] leading-relaxed">
+                    <div className="grid gap-5 md:gap-6 text-sm md:text-base leading-relaxed">
                       {[
                         { key: "problem", label: "Problem" },
                         { key: "solution", label: "Solution" },
@@ -1098,21 +1098,21 @@ export default function ResultsPage() {
                               Object.keys(webSearch).length === 0);
                           return (
                             <div key="web-summary-block">
-                              <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-2.5">
-                                <div className="text-[10px] uppercase font-semibold tracking-wider text-emerald-300/80 mb-1 flex items-center gap-1">
+                              <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-3">
+                                <div className="text-xs uppercase font-semibold tracking-wider text-emerald-300/80 mb-2 flex items-center gap-1">
                                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                                   Online Summary & Market Growth
                                 </div>
                                 {emptyJson ? (
-                                  <div className="text-[11px] opacity-80">
+                                  <div className="text-sm opacity-80">
                                     Data isn&apos;t available online for these
                                     columns
                                   </div>
                                 ) : (
                                   <div className="grid gap-2">
                                     {/* Latest online updates */}
-                                    <div className="rounded border border-emerald-500/30 p-2">
-                                      <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">
+                                    <div className="rounded border border-emerald-500/30 p-2.5">
+                                      <div className="text-xs uppercase tracking-wider text-emerald-200/80 mb-2">
                                         Latest Online Updates
                                       </div>
                                       {Array.isArray(
@@ -1123,10 +1123,7 @@ export default function ResultsPage() {
                                         <ul className="list-disc pl-4 space-y-1 marker:text-emerald-400/80">
                                           {webSearch.latest_online_updates.map(
                                             (u: any, i: number) => (
-                                              <li
-                                                key={i}
-                                                className="text-[11px]"
-                                              >
+                                              <li key={i} className="text-sm">
                                                 <span className="opacity-90">
                                                   {u?.summary || ""}
                                                 </span>{" "}
@@ -1145,18 +1142,18 @@ export default function ResultsPage() {
                                           )}
                                         </ul>
                                       ) : (
-                                        <div className="text-[11px] opacity-70">
+                                        <div className="text-sm opacity-70">
                                           Data isn&apos;t available online
                                         </div>
                                       )}
                                     </div>
                                     {/* Market growth */}
-                                    <div className="rounded border border-emerald-500/30 p-2">
-                                      <div className="text-[10px] uppercase tracking-wider text-emerald-200/80 mb-1">
+                                    <div className="rounded border border-emerald-500/30 p-2.5">
+                                      <div className="text-xs uppercase tracking-wider text-emerald-200/80 mb-2">
                                         Market Growth
                                       </div>
                                       {webSearch?.market_growth?.summary ? (
-                                        <div className="text-[11px]">
+                                        <div className="text-sm">
                                           <span className="opacity-90">
                                             {webSearch.market_growth.summary}
                                           </span>{" "}
@@ -1174,7 +1171,7 @@ export default function ResultsPage() {
                                           )}
                                         </div>
                                       ) : (
-                                        <div className="text-[11px] opacity-70">
+                                        <div className="text-sm opacity-70">
                                           Data isn&apos;t available online
                                         </div>
                                       )}
@@ -1231,12 +1228,12 @@ export default function ResultsPage() {
                                   return (
                                     <div
                                       key={sub}
-                                      className="rounded-md bg-white/[0.02] p-2 border border-white/[0.04]"
+                                      className="rounded-md bg-white/[0.02] p-2.5 border border-white/[0.04]"
                                     >
-                                      <div className="text-[9px] uppercase tracking-wider font-semibold text-indigo-300/60 mb-1">
+                                      <div className="text-xs uppercase tracking-wider font-semibold text-indigo-300/60 mb-1.5">
                                         {prettyLabel}
                                       </div>
-                                      <div className="text-[11px] md:text-[12px] leading-relaxed whitespace-pre-wrap opacity-90">
+                                      <div className="text-sm md:text-base leading-relaxed whitespace-pre-wrap opacity-90">
                                         {nodeText}
                                       </div>
                                     </div>
@@ -1262,15 +1259,15 @@ export default function ResultsPage() {
                                   {items.map((h: any, i: number) => (
                                     <li
                                       key={i}
-                                      className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2.5"
+                                      className="rounded-md border border-amber-400/20 bg-amber-400/5 p-3"
                                     >
                                       {h.claim && (
-                                        <div className="font-medium text-[11px] md:text-[12px] leading-snug mb-1 text-amber-200/90">
+                                        <div className="font-medium text-sm md:text-base leading-snug mb-1.5 text-amber-200/90">
                                           {h.claim}
                                         </div>
                                       )}
                                       {h.status && (
-                                        <div className="text-[10px] md:text-[11px] text-amber-300/70">
+                                        <div className="text-xs md:text-sm text-amber-300/70">
                                           {h.status}
                                         </div>
                                       )}
@@ -1284,14 +1281,14 @@ export default function ResultsPage() {
                               return (
                                 <ol className="space-y-3 list-decimal pl-4 marker:text-indigo-300/60">
                                   {items.map((q: any, i: number) => (
-                                    <li key={i} className="space-y-1">
+                                    <li key={i} className="space-y-1.5">
                                       {q.question && (
-                                        <div className="font-medium text-[11px] md:text-[12px] leading-snug text-indigo-100/90">
+                                        <div className="font-medium text-sm md:text-base leading-snug text-indigo-100/90">
                                           {q.question}
                                         </div>
                                       )}
                                       {q.rationale && (
-                                        <div className="text-[10px] md:text-[11px] text-indigo-200/60">
+                                        <div className="text-xs md:text-sm text-indigo-200/60">
                                           {q.rationale}
                                         </div>
                                       )}
@@ -1339,9 +1336,9 @@ export default function ResultsPage() {
                         return (
                           <div
                             key={section.key}
-                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2.5 border border-white/5"
+                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5"
                           >
-                            <div className="text-[10px] uppercase font-semibold tracking-wider text-indigo-300/70 mb-1 flex items-center gap-1">
+                            <div className="text-xs uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                               {section.label}
                             </div>
@@ -1353,7 +1350,7 @@ export default function ResultsPage() {
                   </div>
                 )}
                 {brief.warnings && (
-                  <div className="text-[10px] text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded-md p-2 font-mono">
+                  <div className="text-xs text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded-md p-3 font-mono">
                     {(brief.warnings as any[]).map((w, i) => (
                       <div key={i}>{w}</div>
                     ))}
