@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,27 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const dropRef = useRef<HTMLDivElement | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [usage, setUsage] = useState<{
+    used: number;
+    limit: number;
+    remaining: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchUsage = async () => {
+      if (!session) return;
+      try {
+        const res = await fetch("/api/user/usage");
+        if (res.ok) {
+          const data = await res.json();
+          setUsage(data);
+        }
+      } catch (e) {
+        console.error("Failed to fetch usage", e);
+      }
+    };
+    fetchUsage();
+  }, [session]);
 
   const handleFiles = useCallback((list: FileList | null) => {
     if (!list || list.length === 0) return;
@@ -72,6 +93,19 @@ export default function Home() {
     } catch (e: any) {
       setError(e.message || "Analyze failed");
       setAnalyzing(false);
+    } finally {
+      // Refresh usage after analysis
+      if (session) {
+        try {
+          const res = await fetch("/api/user/usage");
+          if (res.ok) {
+            const data = await res.json();
+            setUsage(data);
+          }
+        } catch (e) {
+          console.error("Failed to refresh usage", e);
+        }
+      }
     }
   };
 
@@ -114,6 +148,35 @@ export default function Home() {
               General Release
             </span>
           </div>
+          {session && usage && (
+            <div
+              className={`mt-4 text-center text-sm px-4 py-2.5 rounded-lg border inline-block mx-auto ${
+                usage.remaining <= 5
+                  ? "bg-red-500/10 border-red-500/30 text-red-300"
+                  : usage.remaining <= 10
+                  ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                  : "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="inline mr-2 opacity-70"
+              >
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <span className="font-semibold">{usage.remaining}</span> of{" "}
+              {usage.limit} analyses remaining
+            </div>
+          )}
         </header>
 
         <div className="grid gap-8 lg:grid-cols-2">

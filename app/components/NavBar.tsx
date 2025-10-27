@@ -18,6 +18,11 @@ export default function NavBar() {
   const [open, setOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const firstFocusRef = useRef<HTMLAnchorElement | null>(null);
+  const [usage, setUsage] = useState<{
+    used: number;
+    limit: number;
+    remaining: number;
+  } | null>(null);
 
   // Initialize theme from localStorage or system preference
   useEffect(() => {
@@ -49,6 +54,28 @@ export default function NavBar() {
       requestAnimationFrame(() => firstFocusRef.current?.focus());
     }
   }, [open]);
+
+  // Fetch user usage
+  useEffect(() => {
+    const fetchUsage = async () => {
+      if (!session) return;
+      try {
+        const res = await fetch("/api/user/usage");
+        if (res.ok) {
+          const data = await res.json();
+          setUsage(data);
+        }
+      } catch (e) {
+        console.error("Failed to fetch usage", e);
+      }
+    };
+    fetchUsage();
+    // Refresh usage every 30 seconds if user is logged in
+    const interval = session ? setInterval(fetchUsage, 30000) : undefined;
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [session]);
 
   const toggleTheme = () => {
     if (typeof document === "undefined") return;
@@ -112,6 +139,38 @@ export default function NavBar() {
               </li>
             )}
           </ul>
+          {/* Usage counter */}
+          {session && usage && (
+            <div
+              className={`hidden md:flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-md border ${
+                usage.remaining <= 5
+                  ? "bg-red-500/10 border-red-500/30 text-red-300"
+                  : usage.remaining <= 10
+                  ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                  : "bg-indigo-500/10 border-indigo-500/30 text-indigo-300"
+              }`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-70"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="17" y1="11" x2="23" y2="11" />
+              </svg>
+              <span className="font-semibold">
+                {usage.remaining}/{usage.limit}
+              </span>
+            </div>
+          )}
           {/* Sun/Moon toggle switch */}
           <button
             onClick={toggleTheme}

@@ -55,6 +55,39 @@ export async function POST(req: NextRequest) {
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // Get user ID
+  let userId = (session as any).user?.id as string | undefined;
+  if (!userId && (session as any).user?.email) {
+    const user = await prisma.user.findUnique({
+      where: { email: (session as any).user.email as string },
+    });
+    userId = user?.id;
+  }
+  if (!userId) {
+    return NextResponse.json({ error: "User not found" }, { status: 500 });
+  }
+
+  // Check analysis limit (25 per user)
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { analysisCount: true },
+  });
+
+  if (!user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  }
+
+  const ANALYSIS_LIMIT = 25;
+  if (user.analysisCount >= ANALYSIS_LIMIT) {
+    return NextResponse.json(
+      {
+        error: `Analysis limit reached. You have used all ${ANALYSIS_LIMIT} analyses.`,
+      },
+      { status: 429 }
+    );
+  }
+
   const body = await req.json().catch(() => null);
   if (!body)
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
@@ -223,17 +256,13 @@ Documents:\n${chunks}`;
   };
   const parsed = extractJson(text) ?? { raw: text };
 
+  // Increment user's analysis count
+  await prisma.user.update({
+    where: { id: userId },
+    data: { analysisCount: { increment: 1 } },
+  });
+
   // Persist company and analysis run
-  let userId = (session as any).user?.id as string | undefined;
-  if (!userId && (session as any).user?.email) {
-    const user = await prisma.user.findUnique({
-      where: { email: (session as any).user.email as string },
-    });
-    userId = user?.id;
-  }
-  if (!userId) {
-    return NextResponse.json({ error: "User not found" }, { status: 500 });
-  }
   const name = companyName.trim();
   const slug = name
     .toLowerCase()
