@@ -131,6 +131,7 @@ export default function ResultsPage() {
   const [brief, setBrief] = useState<Brief | null>(null);
   const [webSearch, setWebSearch] = useState<any | null>(null);
   const [companyName, setCompanyName] = useState("");
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -159,6 +160,7 @@ export default function ResultsPage() {
         const data = await res.json();
         setBrief(data.brief);
         setCompanyName(data.companyName || "");
+        setCreatedAt(data.createdAt || null);
         setWebSearch(data.webSearch || null);
         setPreviousRuns(data.previousRuns || null);
       } catch (e: any) {
@@ -778,6 +780,38 @@ export default function ResultsPage() {
             <p className="mt-2 text-sm max-w-prose text-foreground/70 leading-relaxed">
               {companyName && `Results for ${companyName}`}
             </p>
+            {createdAt && (
+              <div className="mt-2 flex items-center gap-2 text-xs text-foreground/60">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-70"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>
+                  Generated on{" "}
+                  {new Date(createdAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}{" "}
+                  at{" "}
+                  {new Date(createdAt).toLocaleTimeString("en-US", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            )}
           </div>
           <button onClick={() => router.push("/")} className="copy-btn">
             ← Back to Home
@@ -1327,29 +1361,92 @@ export default function ResultsPage() {
                 )}
               </div>
             )}
-            {/* Previous analyses accordion */}
+            {/* Previous analyses */}
             {previousRuns && previousRuns.length > 0 && (
-              <div className="mt-6 space-y-2">
-                <div className="text-[10px] uppercase font-semibold tracking-wider text-indigo-300/70">
-                  Previous analyses
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <div className="text-sm font-semibold tracking-tight mb-3 flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-70"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  Previous Analyses for {companyName}
                 </div>
-                <div className="space-y-2">
+                <div className="grid gap-2">
                   {previousRuns.map((r) => (
-                    <details
+                    <button
                       key={r.id}
-                      className="rounded-md border border-white/10 bg-white/5"
+                      onClick={() => router.push(`/results/${r.id}`)}
+                      className="group w-full text-left rounded-lg border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-indigo-500/30 transition-all p-3 flex items-center justify-between"
                     >
-                      <summary className="cursor-pointer px-3 py-2 text-sm font-medium">
-                        {new Date(r.createdAt).toLocaleString()}
-                      </summary>
-                      <div className="p-3 text-sm overflow-auto">
-                        <pre className="whitespace-pre-wrap text-xs opacity-90">
-                          {JSON.stringify(r.brief, null, 2)}
-                        </pre>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="text-indigo-400"
+                          >
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                          </svg>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium mb-0.5">
+                            Analysis from{" "}
+                            {new Date(r.createdAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <div className="text-xs opacity-60">
+                            {new Date(r.createdAt).toLocaleTimeString("en-US", {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </div>
+                        </div>
                       </div>
-                    </details>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
+                    </button>
                   ))}
                 </div>
+                <p className="text-xs opacity-60 mt-3">
+                  Click on any analysis to view the full formatted results
+                </p>
               </div>
             )}
           </div>

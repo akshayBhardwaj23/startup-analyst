@@ -69,6 +69,7 @@ export async function GET(
   return NextResponse.json({
     brief: run.brief,
     companyName: run.companyName,
+    createdAt: run.createdAt,
     webSearch: null, // Could be fetched again if needed
     previousRuns: previous,
   });
