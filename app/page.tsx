@@ -431,7 +431,8 @@ export default function Home() {
                       </h3>
                       <p className="text-xs text-foreground/70 leading-relaxed">
                         Get investor-style summaries with ratings, strategic
-                        analysis (Ansoff Matrix), hypotheses, and key questions.
+                        analysis (Ansoff Matrix, Business Model Canvas, Roger's
+                        Bell curve), hypotheses, and key questions.
                       </p>
                     </div>
                   </div>
