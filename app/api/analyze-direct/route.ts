@@ -120,6 +120,10 @@ export async function POST(req: NextRequest) {
     "quadrant": "MARKET_PENETRATION|MARKET_DEVELOPMENT|PRODUCT_DEVELOPMENT|DIVERSIFICATION",
     "rationale": {"text":"...","refs":[...]}
   },
+  "rogers_bell_curve": {
+    "category": "INNOVATORS|EARLY_ADOPTERS|EARLY_MAJORITY|LATE_MAJORITY|LAGGARDS",
+    "rationale": {"text":"...","refs":[...]}
+  },
   "why_now": {"text":"...","refs":[...]},
   "hypotheses": [ {"claim":"...","status":"NO-EVIDENCE|SUPPORTED","refs":[...]}, ... ],
   "founder_questions": [ {"question":"...","rationale":"..."}, ... ],
@@ -143,6 +147,9 @@ Rules:
 - Ansoff Matrix Analysis:
   - Determine which quadrant the product/strategy fits: MARKET_PENETRATION (existing product, existing market), MARKET_DEVELOPMENT (existing product, new market), PRODUCT_DEVELOPMENT (new product, existing market), or DIVERSIFICATION (new product, new market).
   - Provide rationale explaining why this quadrant applies based on evidence in documents.
+- Rogers Bell Curve (Diffusion of Innovations):
+  - Determine which adopter category the startup is currently targeting: INNOVATORS (2.5% - technology enthusiasts, risk-takers), EARLY_ADOPTERS (13.5% - visionaries, opinion leaders), EARLY_MAJORITY (34% - pragmatists, deliberate), LATE_MAJORITY (34% - skeptics, risk-averse), or LAGGARDS (16% - traditionalists, last to adopt).
+  - Provide rationale explaining which customer segment they're targeting based on product complexity, pricing, marketing approach, and customer characteristics mentioned in documents.
 - Keep language concise, analyst tone.
 - Do NOT invent numbers; if TAM components not present, still include keys with empty text "" and empty refs [].
 - Ratings:

@@ -12,6 +12,9 @@ const AnsoffMatrix = dynamic(() => import("../../components/AnsoffMatrix"), {
 const BusinessModelCanvas = dynamic(() => import("../../components/BusinessModelCanvas"), {
   ssr: false,
 });
+const RogersBellCurve = dynamic(() => import("../../components/RogersBellCurve"), {
+  ssr: false,
+});
 
 type Brief = Record<string, any>;
 
@@ -643,6 +646,29 @@ export default function ResultsPage() {
         return parts.join("\n\n");
       };
 
+      const formatRogersBellCurve = (obj: any): string => {
+        if (!obj || typeof obj !== "object") return toLinesStr(obj);
+        const parts: string[] = [];
+
+        if (obj.category) {
+          const categoryMap: Record<string, string> = {
+            INNOVATORS: "Innovators (2.5% - Technology enthusiasts, risk-takers)",
+            EARLY_ADOPTERS: "Early Adopters (13.5% - Visionaries, opinion leaders)",
+            EARLY_MAJORITY: "Early Majority (34% - Pragmatists, deliberate adopters)",
+            LATE_MAJORITY: "Late Majority (34% - Skeptics, risk-averse)",
+            LAGGARDS: "Laggards (16% - Traditionalists, last to adopt)",
+          };
+          parts.push(`Target Adopter Category: ${categoryMap[obj.category] || obj.category}`);
+        }
+
+        if (obj.rationale) {
+          const rationaleText = toLinesStr(obj.rationale);
+          if (rationaleText) parts.push(`Rationale: ${rationaleText}`);
+        }
+
+        return parts.join("\n\n");
+      };
+
       // Web-search sections
       const formatWebLatest = (
         web: any
@@ -709,6 +735,7 @@ export default function ResultsPage() {
       pushIf("Moat", formatList((brief as any).moat_bullets));
       pushIf("Risks", formatList((brief as any).risks_bullets));
       pushIf("Ansoff Matrix", formatAnsoffMatrix((brief as any).ansoff_matrix));
+      pushIf("Rogers Bell Curve", formatRogersBellCurve((brief as any).rogers_bell_curve));
 
       const maxY = pageHeight - margin;
       const writeSection = (s: Section) => {
@@ -1148,6 +1175,7 @@ export default function ResultsPage() {
                         },
                         { key: "risks_bullets", label: "Risks" },
                         { key: "ansoff_matrix", label: "Ansoff Matrix" },
+                        { key: "rogers_bell_curve", label: "Rogers Bell Curve (Adoption)" },
                         { key: "business_model_canvas", label: "Business Model Canvas" },
                         { key: "why_now", label: "Why Now" },
                         { key: "hypotheses", label: "Hypotheses" },
@@ -1722,6 +1750,14 @@ export default function ResultsPage() {
                           ) {
                             if (!val.quadrant) return null;
                             return <AnsoffMatrix data={val} />;
+                          }
+                          // Rogers Bell Curve: special rendering with component
+                          if (
+                            section.key === "rogers_bell_curve" &&
+                            typeof val === "object"
+                          ) {
+                            if (!val.category) return null;
+                            return <RogersBellCurve data={val} />;
                           }
                           // Business Model Canvas: special rendering with component
                           if (
