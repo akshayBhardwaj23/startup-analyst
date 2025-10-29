@@ -37,17 +37,6 @@ export async function GET(
       id,
       userId,
     },
-    select: {
-      id: true,
-      companyName: true,
-      brief: true,
-      fileUrls: true,
-      fileNames: true,
-      createdAt: true,
-      companyId: true,
-      industry: true,
-      stage: true,
-    },
   });
 
   if (!run) {
@@ -69,11 +58,11 @@ export async function GET(
   // Note: We don't have webSearch stored in the database, so it will be null
   // You might want to re-run the web search here if needed
   return NextResponse.json({
-    brief: run.brief,
-    companyName: run.companyName,
-    createdAt: run.createdAt,
-    industry: run.industry,
-    stage: run.stage,
+  brief: (run as any).brief,
+  companyName: (run as any).companyName,
+  createdAt: (run as any).createdAt,
+  industry: (run as any).industry,
+  stage: (run as any).stage,
     webSearch: null, // Could be fetched again if needed
     previousRuns: previous,
   });

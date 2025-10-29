@@ -52,7 +52,7 @@ export async function GET(
       createdAt: true,
       industry: true,
       stage: true,
-    },
+    } as any,
   });
 
   return NextResponse.json({

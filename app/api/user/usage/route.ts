@@ -28,7 +28,6 @@ export async function GET() {
   // Get user's analysis count
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { analysisCount: true },
   });
 
   if (!user) {
@@ -36,8 +35,8 @@ export async function GET() {
   }
 
   return NextResponse.json({
-    used: user.analysisCount,
+    used: (user as any).analysisCount,
     limit: ANALYSIS_LIMIT,
-    remaining: Math.max(0, ANALYSIS_LIMIT - user.analysisCount),
+    remaining: Math.max(0, ANALYSIS_LIMIT - (user as any).analysisCount),
   });
 }

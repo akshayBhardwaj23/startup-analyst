@@ -44,7 +44,7 @@ export default async function HistoryPage() {
       runs: {
         orderBy: { createdAt: "desc" },
         take: 1,
-        select: { createdAt: true, industry: true, stage: true },
+  select: { createdAt: true, industry: true, stage: true } as any,
       },
     },
   });

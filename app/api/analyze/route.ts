@@ -71,7 +71,6 @@ export async function POST(req: NextRequest) {
   // Check analysis limit (25 per user)
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { analysisCount: true },
   });
 
   if (!user) {
@@ -79,7 +78,7 @@ export async function POST(req: NextRequest) {
   }
 
   const ANALYSIS_LIMIT = 25;
-  if (user.analysisCount >= ANALYSIS_LIMIT) {
+  if ((user as any).analysisCount >= ANALYSIS_LIMIT) {
     return NextResponse.json(
       {
         error: `Analysis limit reached. You have used all ${ANALYSIS_LIMIT} analyses.`,
@@ -311,7 +310,7 @@ Documents:\n${chunks}`;
   // Increment user's analysis count
   await prisma.user.update({
     where: { id: userId },
-    data: { analysisCount: { increment: 1 } },
+    data: { analysisCount: { increment: 1 } } as any,
   });
 
   // Persist company and analysis run
@@ -335,7 +334,7 @@ Documents:\n${chunks}`;
       fileNames: names as any,
       industry: (parsed as any)?.industry || null,
       stage: (parsed as any)?.stage || null,
-    },
+    } as any,
   });
 
   // Fetch previous runs for same company (excluding current)

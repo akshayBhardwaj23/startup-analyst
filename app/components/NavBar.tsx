@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
+import ProModal from "./ProModal";
 
 const links = [
   { href: "/", label: "Home" },
@@ -17,6 +18,7 @@ export default function NavBar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [proOpen, setProOpen] = useState(false);
   const firstFocusRef = useRef<HTMLAnchorElement | null>(null);
   const [usage, setUsage] = useState<{
     used: number;
@@ -139,6 +141,18 @@ export default function NavBar() {
               </li>
             )}
           </ul>
+          {/* Go Pro CTA */}
+          <button
+            type="button"
+            onClick={() => setProOpen(true)}
+            className="pro-cta hidden md:inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5"
+            title="Go Pro"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" aria-hidden>
+              <path d="M12 .587l3.668 7.431L24 9.748l-6 5.854 1.417 8.264L12 19.771l-7.417 4.095L6 15.602 0 9.748l8.332-1.73z" />
+            </svg>
+            <span className="font-semibold !text-black dark:!text-white">Go Pro</span>
+          </button>
           {/* Usage counter */}
           {session && usage && (
             <div
@@ -362,11 +376,30 @@ export default function NavBar() {
                     </Link>
                   </li>
                 )}
+                <li>
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      setProOpen(true);
+                    }}
+                    className="pro-cta block w-full text-left px-3 py-2 transition"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24" aria-hidden>
+                        <path d="M12 .587l3.668 7.431L24 9.748l-6 5.854 1.417 8.264L12 19.771l-7.417 4.095L6 15.602 0 9.748l8.332-1.73z" />
+                      </svg>
+                      <span className="!text-black dark:!text-white">Go Pro</span>
+                        <span className="!text-black dark:!text-white">Go Pro</span>
+                    </span>
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
         </>
       )}
+      {/* Pro modal */}
+      <ProModal open={proOpen} onClose={() => setProOpen(false)} />
     </nav>
   );
 }
