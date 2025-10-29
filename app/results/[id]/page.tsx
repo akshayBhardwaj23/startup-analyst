@@ -9,6 +9,9 @@ const ChatDrawer = dynamic(() => import("../../components/ChatDrawer"), {
 const AnsoffMatrix = dynamic(() => import("../../components/AnsoffMatrix"), {
   ssr: false,
 });
+const BusinessModelCanvas = dynamic(() => import("../../components/BusinessModelCanvas"), {
+  ssr: false,
+});
 
 type Brief = Record<string, any>;
 
@@ -1145,6 +1148,7 @@ export default function ResultsPage() {
                         },
                         { key: "risks_bullets", label: "Risks" },
                         { key: "ansoff_matrix", label: "Ansoff Matrix" },
+                        { key: "business_model_canvas", label: "Business Model Canvas" },
                         { key: "why_now", label: "Why Now" },
                         { key: "hypotheses", label: "Hypotheses" },
                         {
@@ -1718,6 +1722,14 @@ export default function ResultsPage() {
                           ) {
                             if (!val.quadrant) return null;
                             return <AnsoffMatrix data={val} />;
+                          }
+                          // Business Model Canvas: special rendering with component
+                          if (
+                            section.key === "business_model_canvas" &&
+                            typeof val === "object"
+                          ) {
+                            if (!val.value_propositions) return null;
+                            return <BusinessModelCanvas data={val} />;
                           }
                           if (typeof val === "object") {
                             if (isEmptyTextRefs(val)) return null;

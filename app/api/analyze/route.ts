@@ -183,6 +183,17 @@ export async function POST(req: NextRequest) {
   },
   "traction_bullets": [ {"text":"...","refs":[...]}, ... ],
   "business_model": {"text":"...","refs":[...]},
+  "business_model_canvas": {
+    "key_partners": {"text":"...","refs":[...]},
+    "key_activities": {"text":"...","refs":[...]},
+    "key_resources": {"text":"...","refs":[...]},
+    "value_propositions": {"text":"...","refs":[...]},
+    "customer_relationships": {"text":"...","refs":[...]},
+    "channels": {"text":"...","refs":[...]},
+    "customer_segments": {"text":"...","refs":[...]},
+    "cost_structure": {"text":"...","refs":[...]},
+    "revenue_streams": {"text":"...","refs":[...]}
+  },
   "tam": {
     "global_market": {"text":"...","refs":[...]},
     "target_segment": {"text":"...","refs":[...]},
@@ -240,6 +251,16 @@ Rules:
 - Ansoff Matrix Analysis:
   - Determine which quadrant the product/strategy fits: MARKET_PENETRATION (existing product, existing market), MARKET_DEVELOPMENT (existing product, new market), PRODUCT_DEVELOPMENT (new product, existing market), or DIVERSIFICATION (new product, new market).
   - Provide rationale explaining why this quadrant applies based on evidence in documents.
+- Business Model Canvas:
+  - key_partners: Who are the key partners and suppliers? Strategic alliances?
+  - key_activities: What key activities does the value proposition require? Distribution channels? Customer relationships?
+  - key_resources: What key resources does the value proposition require? Physical, intellectual, human, financial?
+  - value_propositions: What value do we deliver to the customer? Which customer needs are we satisfying?
+  - customer_relationships: What type of relationship does each customer segment expect? How are they established and maintained?
+  - channels: Through which channels do customers want to be reached? How are we reaching them now?
+  - customer_segments: For whom are we creating value? Who are our most important customers?
+  - cost_structure: What are the most important costs? Which key resources/activities are most expensive?
+  - revenue_streams: For what value are customers willing to pay? How are they currently paying? How would they prefer to pay?
 - Keep language concise, analyst tone.
 - Do NOT invent numbers; if TAM components not present, still include keys with empty text "" and empty refs [].
 - Ratings:
