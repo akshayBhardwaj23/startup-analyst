@@ -908,7 +908,7 @@ export default function ResultsPage() {
                   )}
                   {stage && (
                     <span
-                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-300 cursor-help"
+                      className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-red-500/10 border border-red-500/30 text-red-300 cursor-help"
                       title="Funding Stage"
                     >
                       <svg

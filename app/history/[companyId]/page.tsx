@@ -153,7 +153,7 @@ export default function CompanyHistoryPage() {
                       )}
                       {r.stage && (
                         <span
-                          className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-purple-500/10 border border-purple-500/30 text-purple-300 cursor-help"
+                          className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/30 text-red-300 cursor-help"
                           title="Funding Stage"
                         >
                           <svg

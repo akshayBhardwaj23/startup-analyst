@@ -328,7 +328,7 @@ export default function Home() {
 
           {/* Right Column: About the App */}
           <section className="panel glass relative overflow-hidden">
-            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 blur-3xl" />
+            <div className="absolute -top-24 -left-24 h-48 w-48 rounded-full bg-gradient-to-br from-indigo-500/20 via-red-500/20 to-pink-500/20 blur-3xl" />
             <div className="relative space-y-6">
               <div>
                 <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-fuchsia-400 text-transparent bg-clip-text mb-3">
@@ -438,7 +438,7 @@ export default function Home() {
                   </div>
 
                   <div className="flex gap-3">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
@@ -528,7 +528,7 @@ export default function Home() {
                     </span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 flex items-center justify-center text-[10px] font-bold text-purple-300">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center text-[10px] font-bold text-red-300">
                       4
                     </span>
                     <span>

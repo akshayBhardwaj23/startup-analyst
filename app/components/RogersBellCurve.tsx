@@ -29,7 +29,7 @@ export default function RogersBellCurve({ data }: RogersBellCurveProps) {
       key: "INNOVATORS",
       label: "Innovators",
       percentage: "2.5%",
-      color: "border-purple-500 bg-purple-500/10",
+  color: "border-red-500 bg-red-500/10",
       description: "Technology enthusiasts, risk-takers",
     },
     {

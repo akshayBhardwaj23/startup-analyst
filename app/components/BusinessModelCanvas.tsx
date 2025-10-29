@@ -67,7 +67,7 @@ export default function BusinessModelCanvas({
         <Block
           title="Key Partners"
           content={data.key_partners}
-          color="border-purple-500/30 bg-purple-500/5"
+          color="border-red-500/30 bg-red-500/5"
           className="h-full"
         />
       </div>

@@ -146,7 +146,7 @@ export default async function HistoryPage() {
                           )}
                           {c.runs[0].stage && (
                             <span
-                              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-purple-500/10 border border-purple-500/30 text-purple-300 cursor-help"
+                              className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-md bg-red-500/10 border border-red-500/30 text-red-300 cursor-help"
                               title="Funding Stage"
                             >
                               <svg
