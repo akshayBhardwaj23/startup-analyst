@@ -1161,11 +1161,67 @@ export default function ResultsPage() {
                         {/* Rationale removed by request */}
                       </div>
                     )}
+                    {/* Problem & Solution at the top (just below ratings) */}
+                    <div className="grid gap-5 md:gap-6">
+                      {(["problem", "solution"] as const).map((key) => {
+                        const label = key === "problem" ? "Problem" : "Solution";
+                        const val: any = (brief as any)[key];
+                        const isEmptyTextRefs = (o: any) =>
+                          o &&
+                          typeof o === "object" &&
+                          typeof o.text === "string" &&
+                          o.text.trim() === "" &&
+                          Array.isArray(o.refs) &&
+                          o.refs.length === 0;
+
+                        const renderTopContent = () => {
+                          if (val == null) return null;
+                          if (Array.isArray(val)) {
+                            const items = (val as any[]).filter(
+                              (v) => !(typeof v === "object" && v && isEmptyTextRefs(v))
+                            );
+                            if (items.length === 0) return null;
+                            return (
+                              <ul className="list-disc pl-4 space-y-1 marker:text-indigo-400/70">
+                                {items.map((v: any, i: number) => (
+                                  <li key={i} className="opacity-90">
+                                    {typeof v === "object" ? v.text || JSON.stringify(v) : String(v)}
+                                  </li>
+                                ))}
+                              </ul>
+                            );
+                          }
+                          if (typeof val === "object") {
+                            if (isEmptyTextRefs(val)) return null;
+                            const text = (val as any).text || JSON.stringify(val, null, 2);
+                            return (
+                              <div className="whitespace-pre-wrap opacity-90 font-normal">{text}</div>
+                            );
+                          }
+                          return <div className="opacity-90">{String(val)}</div>;
+                        };
+
+                        const content = renderTopContent();
+                        if (!content) return null;
+                        return (
+                          <div
+                            key={key}
+                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5"
+                          >
+                            <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
+                              <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
+                              {label}
+                            </div>
+                            {content}
+                          </div>
+                        );
+                      })}
+                    </div>
                     {/* Strategic Analysis Components */}
                     <div className="grid gap-5 md:gap-6">
                       {brief.business_model_canvas?.value_propositions && (
                         <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
-                          <div className="text-xs uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
+                          <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Business Model Canvas
                           </div>
@@ -1176,7 +1232,7 @@ export default function ResultsPage() {
                       )}
                       {brief.ansoff_matrix?.quadrant && (
                         <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
-                          <div className="text-xs uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
+                          <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Ansoff Matrix
                           </div>
@@ -1185,7 +1241,7 @@ export default function ResultsPage() {
                       )}
                       {brief.rogers_bell_curve?.category && (
                         <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
-                          <div className="text-xs uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
+                          <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Rogers Bell Curve (Adoption)
                           </div>
@@ -1195,17 +1251,10 @@ export default function ResultsPage() {
                     </div>
                     <div className="grid gap-5 md:gap-6 text-sm md:text-base leading-relaxed">
                       {[
-                        { key: "problem", label: "Problem" },
-                        { key: "solution", label: "Solution" },
                         {
                           key: "icp_gtm",
                           label: "ICP & GTM",
                           nested: ["icp", "gtm"],
-                        },
-                        // Inject web-search block between ICP & GTM and Traction
-                        {
-                          key: "__web_between__",
-                          label: "__web_between__" as any,
                         },
                         { key: "traction_bullets", label: "Traction" },
                         { key: "business_model", label: "Business Model" },
@@ -1229,98 +1278,6 @@ export default function ResultsPage() {
                           label: "Founder Questions",
                         },
                       ].map((section) => {
-                        // Special pseudo-section to inject online web summary block
-                        if (section.key === "__web_between__") {
-                          const emptyJson =
-                            !webSearch ||
-                            (typeof webSearch === "object" &&
-                              Object.keys(webSearch).length === 0);
-                          return (
-                            <div key="web-summary-block">
-                              <div className="rounded-md border border-emerald-500/40 bg-emerald-500/5 p-3">
-                                <div className="text-xs uppercase font-semibold tracking-wider text-emerald-300/80 mb-2 flex items-center gap-1">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                                  Online Summary & Market Growth
-                                </div>
-                                {emptyJson ? (
-                                  <div className="text-sm opacity-80">
-                                    Data isn&apos;t available online for these
-                                    columns
-                                  </div>
-                                ) : (
-                                  <div className="grid gap-2">
-                                    {/* Latest online updates */}
-                                    <div className="rounded border border-emerald-500/30 p-2.5">
-                                      <div className="text-xs uppercase tracking-wider text-emerald-200/80 mb-2">
-                                        Latest Online Updates
-                                      </div>
-                                      {Array.isArray(
-                                        webSearch?.latest_online_updates
-                                      ) &&
-                                      webSearch.latest_online_updates.length >
-                                        0 ? (
-                                        <ul className="list-disc pl-4 space-y-1 marker:text-emerald-400/80">
-                                          {webSearch.latest_online_updates.map(
-                                            (u: any, i: number) => (
-                                              <li key={i} className="text-sm">
-                                                <span className="opacity-90">
-                                                  {u?.summary || ""}
-                                                </span>{" "}
-                                                {u?.source && (
-                                                  <a
-                                                    href={u.source}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-emerald-300/90 hover:underline"
-                                                  >
-                                                    🔗
-                                                  </a>
-                                                )}
-                                              </li>
-                                            )
-                                          )}
-                                        </ul>
-                                      ) : (
-                                        <div className="text-sm opacity-70">
-                                          Data isn&apos;t available online
-                                        </div>
-                                      )}
-                                    </div>
-                                    {/* Market growth */}
-                                    <div className="rounded border border-emerald-500/30 p-2.5">
-                                      <div className="text-xs uppercase tracking-wider text-emerald-200/80 mb-2">
-                                        Market Growth
-                                      </div>
-                                      {webSearch?.market_growth?.summary ? (
-                                        <div className="text-sm">
-                                          <span className="opacity-90">
-                                            {webSearch.market_growth.summary}
-                                          </span>{" "}
-                                          {webSearch?.market_growth?.source && (
-                                            <a
-                                              href={
-                                                webSearch.market_growth.source
-                                              }
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-emerald-300/90 hover:underline"
-                                            >
-                                              🔗
-                                            </a>
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <div className="text-sm opacity-70">
-                                          Data isn&apos;t available online
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        }
 
                         const val: any = (brief as any)[section.key];
                         const renderVal = () => {
@@ -1369,7 +1326,7 @@ export default function ResultsPage() {
                                       key={sub}
                                       className="rounded-md bg-white/[0.02] p-2.5 border border-white/[0.04]"
                                     >
-                                      <div className="text-xs uppercase tracking-wider font-semibold text-indigo-300/60 mb-1.5">
+                                      <div className="text-base uppercase tracking-wider font-semibold text-indigo-300/60 mb-1.5">
                                         {prettyLabel}
                                       </div>
                                       <div className="text-sm md:text-base leading-relaxed whitespace-pre-wrap opacity-90">
@@ -1809,7 +1766,7 @@ export default function ResultsPage() {
                             key={section.key}
                             className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5"
                           >
-                            <div className="text-xs uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
+                            <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                               {section.label}
                             </div>
@@ -1832,7 +1789,7 @@ export default function ResultsPage() {
             {/* Previous analyses */}
             {previousRuns && previousRuns.length > 0 && (
               <div className="mt-8 pt-6 border-t border-white/10">
-                <div className="text-sm font-semibold tracking-tight mb-3 flex items-center gap-2">
+                <div className="text-lg font-semibold tracking-tight mb-3 flex items-center gap-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
