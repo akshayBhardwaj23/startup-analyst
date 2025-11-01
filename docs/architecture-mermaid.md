@@ -4,36 +4,36 @@
 
 ```mermaid
 graph TB
-    subgraph "Frontend Layer"
+    subgraph Frontend["Frontend Layer"]
         A[Home Page] --> B[Results Page]
         A --> C[History Page]
         D[Components] --> B
         D --> C
         E[Auth UI] --> A
     end
-
-    subgraph "API Layer"
-        F[/api/analyze]
-        G[/api/results]
-        H[/api/web-search]
-        I[/api/blob/upload]
-        J[/api/user/usage]
-        K[/api/history]
+    
+    subgraph API["API Layer"]
+        F["API: /api/analyze"]
+        G["API: /api/results"]
+        H["API: /api/web-search"]
+        I["API: /api/blob/upload"]
+        J["API: /api/user/usage"]
+        K["API: /api/history"]
     end
-
-    subgraph "Services"
+    
+    subgraph Services["Services"]
         L[Prisma ORM]
         M[Document Parser]
         N[AI Processor]
         O[Rate Limiter]
     end
-
-    subgraph "Data Layer"
+    
+    subgraph Data["Data Layer"]
         P[(PostgreSQL)]
         Q[Vercel Blob Storage]
     end
-
-    subgraph "External Services"
+    
+    subgraph External["External Services"]
         R[Google Gemini AI]
         S[Google OAuth]
     end
@@ -169,7 +169,7 @@ flowchart LR
     D -->|Yes| E[Chunk Text]
     D -->|No| F[Send to Gemini]
     E --> F
-    F --> G[Gemini 2.0 Flash]
+    F --> G[Gemini 2.5 Pro]
     G --> H[Structured Analysis]
     H --> I[Generate Tags]
     H --> J[Extract Founders]

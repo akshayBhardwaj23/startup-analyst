@@ -85,7 +85,7 @@ VC Analyst AI is a Next.js-based application powered by Google Gemini AI that pr
 - Performs online research about the company
 - Fetches latest news and updates
 - Gathers market growth data
-- Uses Gemini 1.5 Flash for efficiency
+- Uses Gemini 2.5 Flash Lite for efficiency
 
 **`/api/history/[companyId]`** (GET)
 
@@ -203,14 +203,14 @@ model AnalysisRun {
 
 #### Google Gemini AI (Vertex AI)
 
-**Gemini 2.0 Flash** - Primary Analysis
+**Gemini 2.5 Pro** - Primary Analysis
 
 - High-quality structured analysis
 - Strategic framework generation
 - Comprehensive startup evaluation
 - JSON mode for structured output
 
-**Gemini 1.5 Flash** - Web Search
+**Gemini 2.5 Flash Lite** - Web Search
 
 - Real-time online research
 - Market data gathering
@@ -247,9 +247,9 @@ model AnalysisRun {
 1. User uploads document(s) → Frontend
 2. Files sent to /api/blob/upload → Vercel Blob Storage
 3. Text extracted from documents
-4. /api/analyze called with text → Gemini 2.0 Flash
+4. /api/analyze called with text → Gemini 2.5 Pro
 5. AI generates structured analysis (JSON)
-6. /api/web-search called → Gemini 1.5 Flash
+6. /api/web-search called → Gemini 2.5 Flash Lite
 7. Results saved to PostgreSQL
 8. User redirected to /results/[id]
 9. Results page fetches and displays formatted analysis
@@ -351,8 +351,8 @@ model AnalysisRun {
 
 ### AI & External Services
 
-- **Primary AI**: Google Gemini 2.0 Flash (Vertex AI)
-- **Search AI**: Google Gemini 1.5 Flash (Vertex AI)
+- **Primary AI**: Google Gemini 2.5 Pro (Vertex AI)
+- **Search AI**: Google Gemini 2.5 Flash Lite (Vertex AI)
 - **Auth Provider**: Google OAuth 2.0
 
 ### Document Processing
@@ -375,7 +375,7 @@ model AnalysisRun {
 3. **Blob Storage**: CDN-backed file delivery
 4. **SSR/SSG**: Server-side rendering for faster page loads
 5. **Rate Limiting**: Prevents API abuse and manages costs
-6. **Efficient AI Model Selection**: 2.0 Flash for analysis, 1.5 Flash for search
+6. **Efficient AI Model Selection**: 2.5 Pro for analysis, 2.5 Flash Lite for search
 
 ## Security Considerations
 
