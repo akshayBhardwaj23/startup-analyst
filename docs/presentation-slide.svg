@@ -1,0 +1,300 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" style="background: #ffffff">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ea4335;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fbbc04;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Header with Google Colors -->
+  <rect x="0" y="0" width="1920" height="180" fill="url(#grad1)"/>
+  
+  <!-- Title -->
+  <text x="960" y="80" text-anchor="middle" fill="#ffffff" font-size="56" font-weight="bold" font-family="Google Sans, Arial, sans-serif">
+    VC Analyst AI
+  </text>
+  <text x="960" y="130" text-anchor="middle" fill="#ffffff" font-size="32" font-family="Google Sans, Arial, sans-serif">
+    AI-Powered Venture Capital Analysis Platform
+  </text>
+
+  <!-- Main Content Area -->
+  <rect x="60" y="220" width="1800" height="800" rx="20" fill="#f8f9fa" filter="url(#shadow)"/>
+
+  <!-- Left Column - Problem & Solution -->
+  <rect x="100" y="260" width="520" height="720" rx="15" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+  
+  <text x="360" y="310" text-anchor="middle" fill="#1a73e8" font-size="28" font-weight="bold" font-family="Google Sans, Arial, sans-serif">
+    The Challenge
+  </text>
+  
+  <circle cx="140" cy="370" r="8" fill="#ea4335"/>
+  <text x="165" y="377" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Manual VC analysis is time-consuming
+  </text>
+  
+  <circle cx="140" cy="420" r="8" fill="#ea4335"/>
+  <text x="165" y="427" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Inconsistent evaluation frameworks
+  </text>
+  
+  <circle cx="140" cy="470" r="8" fill="#ea4335"/>
+  <text x="165" y="477" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Difficult to scale due diligence
+  </text>
+
+  <line x1="120" y1="520" x2="600" y2="520" stroke="#e0e0e0" stroke-width="2"/>
+
+  <text x="360" y="570" text-anchor="middle" fill="#34a853" font-size="28" font-weight="bold" font-family="Google Sans, Arial, sans-serif">
+    Our Solution
+  </text>
+  
+  <circle cx="140" cy="630" r="8" fill="#34a853"/>
+  <text x="165" y="637" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Automated AI analysis in minutes
+  </text>
+  
+  <circle cx="140" cy="680" r="8" fill="#34a853"/>
+  <text x="165" y="687" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Standardized strategic frameworks
+  </text>
+  
+  <circle cx="140" cy="730" r="8" fill="#34a853"/>
+  <text x="165" y="737" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Scalable with rate-limited API
+  </text>
+
+  <circle cx="140" cy="780" r="8" fill="#34a853"/>
+  <text x="165" y="787" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Real-time market research
+  </text>
+
+  <circle cx="140" cy="830" r="8" fill="#34a853"/>
+  <text x="165" y="837" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Comprehensive risk assessment
+  </text>
+
+  <circle cx="140" cy="880" r="8" fill="#34a853"/>
+  <text x="165" y="887" fill="#202124" font-size="18" font-family="Arial, sans-serif">
+    Historical analysis tracking
+  </text>
+
+  <!-- Center Column - Architecture Flow -->
+  <rect x="660" y="260" width="600" height="720" rx="15" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+  
+  <text x="960" y="310" text-anchor="middle" fill="#1a73e8" font-size="28" font-weight="bold" font-family="Google Sans, Arial, sans-serif">
+    System Architecture
+  </text>
+
+  <!-- Flow boxes -->
+  <rect x="780" y="350" width="360" height="70" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="960" y="375" text-anchor="middle" fill="#1a73e8" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    📄 Document Upload (PDF/DOCX)
+  </text>
+  <text x="960" y="400" text-anchor="middle" fill="#5f6368" font-size="14" font-family="Arial, sans-serif">
+    Next.js Frontend + Vercel Blob Storage
+  </text>
+
+  <!-- Arrow -->
+  <path d="M 960 420 L 960 450" stroke="#1a73e8" stroke-width="3" fill="none" marker-end="url(#arrow1)"/>
+
+  <rect x="780" y="450" width="360" height="70" rx="10" fill="#fef7e0" stroke="#fbbc04" stroke-width="2"/>
+  <text x="960" y="475" text-anchor="middle" fill="#f9ab00" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    🤖 AI Analysis Engine
+  </text>
+  <text x="960" y="500" text-anchor="middle" fill="#5f6368" font-size="14" font-family="Arial, sans-serif">
+    Google Gemini 2.5 Pro (Vertex AI)
+  </text>
+
+  <!-- Arrow -->
+  <path d="M 960 520 L 960 550" stroke="#1a73e8" stroke-width="3" fill="none" marker-end="url(#arrow1)"/>
+
+  <rect x="780" y="550" width="360" height="70" rx="10" fill="#e6f4ea" stroke="#34a853" stroke-width="2"/>
+  <text x="960" y="575" text-anchor="middle" fill="#34a853" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    🔍 Web Research
+  </text>
+  <text x="960" y="600" text-anchor="middle" fill="#5f6368" font-size="14" font-family="Arial, sans-serif">
+    Gemini 2.5 Flash Lite + Market Data
+  </text>
+
+  <!-- Arrow -->
+  <path d="M 960 620 L 960 650" stroke="#1a73e8" stroke-width="3" fill="none" marker-end="url(#arrow1)"/>
+
+  <rect x="780" y="650" width="360" height="70" rx="10" fill="#fce8e6" stroke="#ea4335" stroke-width="2"/>
+  <text x="960" y="675" text-anchor="middle" fill="#ea4335" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    💾 Data Storage
+  </text>
+  <text x="960" y="700" text-anchor="middle" fill="#5f6368" font-size="14" font-family="Arial, sans-serif">
+    PostgreSQL + Prisma ORM
+  </text>
+
+  <!-- Arrow -->
+  <path d="M 960 720 L 960 750" stroke="#1a73e8" stroke-width="3" fill="none" marker-end="url(#arrow1)"/>
+
+  <rect x="780" y="750" width="360" height="70" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="960" y="775" text-anchor="middle" fill="#1a73e8" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    📊 Results Display
+  </text>
+  <text x="960" y="800" text-anchor="middle" fill="#5f6368" font-size="14" font-family="Arial, sans-serif">
+    Interactive Dashboard + PDF Export
+  </text>
+
+  <text x="960" y="860" text-anchor="middle" fill="#5f6368" font-size="16" font-style="italic" font-family="Arial, sans-serif">
+    ⚡ Average Analysis Time: &lt; 60 seconds
+  </text>
+
+  <rect x="700" y="890" width="520" height="70" rx="10" fill="#f1f3f4" stroke="#5f6368" stroke-width="1"/>
+  <text x="960" y="915" text-anchor="middle" fill="#5f6368" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
+    🔒 Security Features
+  </text>
+  <text x="960" y="940" text-anchor="middle" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    Google OAuth • Rate Limiting (25/user) • Row-Level Security
+  </text>
+
+  <!-- Right Column - Key Features -->
+  <rect x="1300" y="260" width="520" height="720" rx="15" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+  
+  <text x="1560" y="310" text-anchor="middle" fill="#1a73e8" font-size="28" font-weight="bold" font-family="Google Sans, Arial, sans-serif">
+    Key Features
+  </text>
+
+  <!-- Features Grid -->
+  <rect x="1330" y="340" width="230" height="100" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1"/>
+  <text x="1445" y="370" text-anchor="middle" fill="#1a73e8" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    📈 Strategic Analysis
+  </text>
+  <text x="1445" y="395" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Ansoff Matrix
+  </text>
+  <text x="1445" y="415" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Business Model Canvas
+  </text>
+  <text x="1445" y="435" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Rogers Bell Curve
+  </text>
+
+  <rect x="1580" y="340" width="230" height="100" rx="8" fill="#fef7e0" stroke="#fbbc04" stroke-width="1"/>
+  <text x="1695" y="370" text-anchor="middle" fill="#f9ab00" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    🎯 Smart Tagging
+  </text>
+  <text x="1695" y="395" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Auto Industry Tags
+  </text>
+  <text x="1695" y="415" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Funding Stage
+  </text>
+  <text x="1695" y="435" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • AI-Generated
+  </text>
+
+  <rect x="1330" y="460" width="230" height="100" rx="8" fill="#e6f4ea" stroke="#34a853" stroke-width="1"/>
+  <text x="1445" y="490" text-anchor="middle" fill="#34a853" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    👥 Founder Insights
+  </text>
+  <text x="1445" y="515" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Profile Extraction
+  </text>
+  <text x="1445" y="535" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Contact Details
+  </text>
+  <text x="1445" y="555" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • LinkedIn Links
+  </text>
+
+  <rect x="1580" y="460" width="230" height="100" rx="8" fill="#fce8e6" stroke="#ea4335" stroke-width="1"/>
+  <text x="1695" y="490" text-anchor="middle" fill="#ea4335" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    ⚠️ Risk Analysis
+  </text>
+  <text x="1695" y="515" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Severity Levels
+  </text>
+  <text x="1695" y="535" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Color-Coded
+  </text>
+  <text x="1695" y="555" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Comprehensive
+  </text>
+
+  <rect x="1330" y="580" width="230" height="100" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1"/>
+  <text x="1445" y="610" text-anchor="middle" fill="#1a73e8" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    💼 Market Research
+  </text>
+  <text x="1445" y="635" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • TAM Analysis
+  </text>
+  <text x="1445" y="655" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Growth Metrics
+  </text>
+  <text x="1445" y="675" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Latest News
+  </text>
+
+  <rect x="1580" y="580" width="230" height="100" rx="8" fill="#fef7e0" stroke="#fbbc04" stroke-width="1"/>
+  <text x="1695" y="610" text-anchor="middle" fill="#f9ab00" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    📊 Ratings System
+  </text>
+  <text x="1695" y="635" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Team Strength
+  </text>
+  <text x="1695" y="655" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Market Quality
+  </text>
+  <text x="1695" y="675" text-anchor="middle" fill="#5f6368" font-size="12" font-family="Arial, sans-serif">
+    • Product/Traction/Moat
+  </text>
+
+  <!-- Tech Stack -->
+  <rect x="1330" y="700" width="480" height="100" rx="8" fill="#f1f3f4" stroke="#5f6368" stroke-width="1"/>
+  <text x="1570" y="730" text-anchor="middle" fill="#5f6368" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+    🛠️ Technology Stack
+  </text>
+  <text x="1570" y="755" text-anchor="middle" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    Next.js 15 • TypeScript • Tailwind CSS • Prisma • PostgreSQL
+  </text>
+  <text x="1570" y="780" text-anchor="middle" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    Google Gemini AI • Vertex AI • Google OAuth • Vercel Blob
+  </text>
+
+  <!-- Metrics Box -->
+  <rect x="1330" y="820" width="480" height="140" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="2"/>
+  <text x="1570" y="855" text-anchor="middle" fill="#1a73e8" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+    📌 Platform Metrics
+  </text>
+  
+  <text x="1390" y="895" fill="#5f6368" font-size="15" font-weight="bold" font-family="Arial, sans-serif">
+    ⚡ &lt; 60 sec
+  </text>
+  <text x="1490" y="895" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    analysis time
+  </text>
+  
+  <text x="1390" y="925" fill="#5f6368" font-size="15" font-weight="bold" font-family="Arial, sans-serif">
+    🎯 25 analyses
+  </text>
+  <text x="1510" y="925" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    per user limit
+  </text>
+  
+  <text x="1390" y="955" fill="#5f6368" font-size="15" font-weight="bold" font-family="Arial, sans-serif">
+    📄 12+ sections
+  </text>
+  <text x="1510" y="955" fill="#5f6368" font-size="13" font-family="Arial, sans-serif">
+    in each analysis
+  </text>
+
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1a73e8" />
+    </marker>
+  </defs>
+
+  <!-- Footer -->
+  <text x="960" y="1050" text-anchor="middle" fill="#5f6368" font-size="18" font-family="Arial, sans-serif">
+    Built for Google AI Hackathon 2025 • Powered by Google Gemini AI via Vertex AI
+  </text>
+</svg>
+

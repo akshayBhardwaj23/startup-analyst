@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%)">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#14b8a6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" fill="#f1f5f9" font-size="32" font-weight="bold" font-family="Arial, sans-serif">
+    VC Analyst AI - Architecture
+  </text>
+  <text x="700" y="70" text-anchor="middle" fill="#94a3b8" font-size="16" font-family="Arial, sans-serif">
+    Powered by Google Gemini AI
+  </text>
+
+  <!-- Frontend Layer -->
+  <rect x="50" y="120" width="1300" height="180" rx="10" fill="url(#grad1)" opacity="0.1" stroke="#6366f1" stroke-width="2"/>
+  <text x="700" y="150" text-anchor="middle" fill="#c7d2fe" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+    Frontend Layer (Next.js 15 + React)
+  </text>
+  
+  <!-- Frontend Components -->
+  <rect x="100" y="170" width="180" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="190" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Home Page</text>
+  <text x="190" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Document Upload</text>
+  <text x="190" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Rate Limiting Display</text>
+  <text x="190" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Brief Generation</text>
+
+  <rect x="320" y="170" width="180" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="410" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Results Page</text>
+  <text x="410" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Analysis Display</text>
+  <text x="410" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Visual Components</text>
+  <text x="410" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">PDF Export</text>
+
+  <rect x="540" y="170" width="180" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="630" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">History Page</text>
+  <text x="630" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Company List</text>
+  <text x="630" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Past Analyses</text>
+  <text x="630" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Tags (Industry/Stage)</text>
+
+  <rect x="760" y="170" width="180" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="850" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Components</text>
+  <text x="850" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Ansoff Matrix</text>
+  <text x="850" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Business Model Canvas</text>
+  <text x="850" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Rogers Bell Curve</text>
+
+  <rect x="980" y="170" width="180" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="1070" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Auth</text>
+  <text x="1070" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">NextAuth.js</text>
+  <text x="1070" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Google OAuth</text>
+  <text x="1070" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">Session Management</text>
+
+  <rect x="1200" y="170" width="150" height="100" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2"/>
+  <text x="1275" y="200" text-anchor="middle" fill="#e0e7ff" font-size="14" font-weight="bold" font-family="Arial, sans-serif">State Mgmt</text>
+  <text x="1275" y="220" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">React Hooks</text>
+  <text x="1275" y="238" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">useState</text>
+  <text x="1275" y="256" text-anchor="middle" fill="#94a3b8" font-size="11" font-family="Arial, sans-serif">useEffect</text>
+
+  <!-- API Layer -->
+  <rect x="50" y="340" width="1300" height="250" rx="10" fill="url(#grad2)" opacity="0.1" stroke="#3b82f6" stroke-width="2"/>
+  <text x="700" y="370" text-anchor="middle" fill="#bfdbfe" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+    API Layer (Next.js API Routes)
+  </text>
+
+  <!-- API Routes -->
+  <rect x="100" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="180" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/analyze</text>
+  <text x="180" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Document Analysis</text>
+  <text x="180" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">AI Processing</text>
+  <text x="180" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Rate Limiting</text>
+
+  <rect x="290" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="370" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/results/[id]</text>
+  <text x="370" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Fetch Analysis</text>
+  <text x="370" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Previous Runs</text>
+  <text x="370" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Web Search Data</text>
+
+  <rect x="480" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="560" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/web-search</text>
+  <text x="560" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Online Research</text>
+  <text x="560" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Market Data</text>
+  <text x="560" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">News &amp; Updates</text>
+
+  <rect x="670" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="750" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/history</text>
+  <text x="750" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Company History</text>
+  <text x="750" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Analysis List</text>
+  <text x="750" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Tag Filtering</text>
+
+  <rect x="860" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="940" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/blob/upload</text>
+  <text x="940" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">File Upload</text>
+  <text x="940" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">PDF/DOCX Parsing</text>
+  <text x="940" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Blob Storage</text>
+
+  <rect x="1050" y="390" width="160" height="80" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+  <text x="1130" y="415" text-anchor="middle" fill="#dbeafe" font-size="13" font-weight="bold" font-family="Arial, sans-serif">/api/user/usage</text>
+  <text x="1130" y="435" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Usage Stats</text>
+  <text x="1130" y="450" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Limit Tracking</text>
+  <text x="1130" y="465" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">25 Analysis Cap</text>
+
+  <!-- Core Services -->
+  <rect x="100" y="495" width="240" height="80" rx="8" fill="#1e293b" stroke="#14b8a6" stroke-width="2"/>
+  <text x="220" y="520" text-anchor="middle" fill="#99f6e4" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Prisma ORM</text>
+  <text x="220" y="540" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Database Queries</text>
+  <text x="220" y="555" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Type Safety</text>
+  <text x="220" y="570" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Migration Management</text>
+
+  <rect x="370" y="495" width="240" height="80" rx="8" fill="#1e293b" stroke="#14b8a6" stroke-width="2"/>
+  <text x="490" y="520" text-anchor="middle" fill="#99f6e4" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Document Processing</text>
+  <text x="490" y="540" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">PDF Parser (pdf-parse)</text>
+  <text x="490" y="555" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">DOCX Parser (mammoth)</text>
+  <text x="490" y="570" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Text Extraction</text>
+
+  <rect x="640" y="495" width="240" height="80" rx="8" fill="#1e293b" stroke="#14b8a6" stroke-width="2"/>
+  <text x="760" y="520" text-anchor="middle" fill="#99f6e4" font-size="13" font-weight="bold" font-family="Arial, sans-serif">AI Processing</text>
+  <text x="760" y="540" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Structured Analysis</text>
+  <text x="760" y="555" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Strategic Frameworks</text>
+  <text x="760" y="570" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Tag Generation</text>
+
+  <rect x="910" y="495" width="240" height="80" rx="8" fill="#1e293b" stroke="#14b8a6" stroke-width="2"/>
+  <text x="1030" y="520" text-anchor="middle" fill="#99f6e4" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Rate Limiting</text>
+  <text x="1030" y="540" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">User Analysis Count</text>
+  <text x="1030" y="555" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">25 Analyses/User</text>
+  <text x="1030" y="570" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Usage Tracking</text>
+
+  <!-- Data Layer -->
+  <rect x="50" y="630" width="600" height="160" rx="10" fill="url(#grad3)" opacity="0.1" stroke="#10b981" stroke-width="2"/>
+  <text x="350" y="660" text-anchor="middle" fill="#a7f3d0" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+    Data Layer
+  </text>
+
+  <rect x="100" y="680" width="220" height="90" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+  <text x="210" y="705" text-anchor="middle" fill="#d1fae5" font-size="13" font-weight="bold" font-family="Arial, sans-serif">PostgreSQL Database</text>
+  <text x="210" y="725" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• User (auth, usage limits)</text>
+  <text x="210" y="740" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Company (metadata)</text>
+  <text x="210" y="755" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• AnalysisRun (briefs, tags)</text>
+
+  <rect x="350" y="680" width="270" height="90" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+  <text x="485" y="705" text-anchor="middle" fill="#d1fae5" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Vercel Blob Storage</text>
+  <text x="485" y="725" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Document Storage (PDF/DOCX)</text>
+  <text x="485" y="740" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• File URL Management</text>
+  <text x="485" y="755" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Secure Access</text>
+
+  <!-- External Services -->
+  <rect x="700" y="630" width="650" height="160" rx="10" fill="url(#grad4)" opacity="0.1" stroke="#f59e0b" stroke-width="2"/>
+  <text x="1025" y="660" text-anchor="middle" fill="#fde68a" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+    External Services
+  </text>
+
+  <rect x="750" y="680" width="270" height="90" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="885" y="705" text-anchor="middle" fill="#fef3c7" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Google Gemini AI (Vertex AI)</text>
+  <text x="885" y="725" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• 2.5 Pro (Analysis)</text>
+  <text x="885" y="740" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• 2.5 Flash Lite (Web Search)</text>
+  <text x="885" y="755" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Structured JSON Output</text>
+
+  <rect x="1050" y="680" width="270" height="90" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+  <text x="1185" y="705" text-anchor="middle" fill="#fef3c7" font-size="13" font-weight="bold" font-family="Arial, sans-serif">Google OAuth 2.0</text>
+  <text x="1185" y="725" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• User Authentication</text>
+  <text x="1185" y="740" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Secure Sign-in</text>
+  <text x="1185" y="755" text-anchor="middle" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">• Session Management</text>
+
+  <!-- Key Features Box -->
+  <rect x="50" y="830" width="1300" height="140" rx="10" fill="#1e293b" stroke="#6366f1" stroke-width="2" opacity="0.8"/>
+  <text x="700" y="860" text-anchor="middle" fill="#c7d2fe" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
+    🎯 Key Features
+  </text>
+  
+  <text x="130" y="890" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ AI-Powered VC Analysis (Problem, Solution, TAM, Team, Risks)
+  </text>
+  <text x="130" y="910" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Strategic Frameworks (Ansoff Matrix, Business Model Canvas, Rogers Bell Curve)
+  </text>
+  <text x="130" y="930" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Founder &amp; Contact Info Extraction
+  </text>
+  <text x="130" y="950" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Risk Assessment with Severity Levels
+  </text>
+  
+  <text x="780" y="890" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Real-time Web Search &amp; Market Data
+  </text>
+  <text x="780" y="910" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Industry &amp; Stage Auto-Tagging
+  </text>
+  <text x="780" y="930" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ Rate Limiting (25 analyses/user)
+  </text>
+  <text x="780" y="950" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    ✓ PDF Export &amp; Analysis History
+  </text>
+
+  <!-- Arrows showing data flow -->
+  <!-- Frontend to API -->
+  <path d="M 700 270 L 700 340" stroke="#6366f1" stroke-width="2" fill="none" marker-end="url(#arrowblue)"/>
+  
+  <!-- API to Services -->
+  <path d="M 700 470 L 700 495" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrowcyan)"/>
+  
+  <!-- Services to Data -->
+  <path d="M 220 575 L 220 630" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrowgreen)"/>
+  
+  <!-- Services to External -->
+  <path d="M 880 575 L 880 630" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arroworange)"/>
+
+  <defs>
+    <marker id="arrowblue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#6366f1" />
+    </marker>
+    <marker id="arrowcyan" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6" />
+    </marker>
+    <marker id="arrowgreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#10b981" />
+    </marker>
+    <marker id="arroworange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#f59e0b" />
+    </marker>
+  </defs>
+</svg>
+
