@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VC Analyst AI - Presentation Infographics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .infographic-section {
+            background: white;
+            margin: 30px 0;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+        .infographic-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #202124;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #4285F4;
+            padding-bottom: 10px;
+        }
+        .infographic-description {
+            color: #5f6368;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            min-height: 200px;
+        }
+        h1 {
+            color: #4285F4;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .instructions {
+            background: #e8f0fe;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+        }
+        .instructions h2 {
+            color: #1a73e8;
+            margin-top: 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #5f6368;
+        }
+    </style>
+</head>
+<body>
+    <h1>VC Analyst AI - Presentation Infographics</h1>
+    
+    <div class="instructions">
+        <h2>📸 How to Use</h2>
+        <ol>
+            <li>Wait for all diagrams to load (may take a few seconds)</li>
+            <li>Scroll through each infographic below</li>
+            <li>Right-click on any infographic → "Inspect" or use screenshot tools</li>
+            <li>Or use browser's print function (Ctrl+P / Cmd+P) → Save as PDF</li>
+            <li>Add the screenshots to your presentation slides</li>
+        </ol>
+        <p><strong>Tip:</strong> You can zoom in/out (Ctrl/Cmd + Mouse Wheel) to adjust size before screenshotting.</p>
+        <p id="status" class="loading">Loading Mermaid diagrams...</p>
+    </div>
+
+    <!-- INFOGRAPHIC 1: Problem - Time vs Coverage -->
+    <div class="infographic-section">
+        <div class="infographic-title">1. Problem - Time Distribution</div>
+        <div class="infographic-description">Use on: <strong>Problem That You Are Solving</strong> slide</div>
+        <div class="mermaid">
+pie title VC Analysis Bottleneck
+    "Time Spent on Analysis" : 95
+    "Other Activities" : 5
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 2: Problem - Funnel -->
+    <div class="infographic-section">
+        <div class="infographic-title">2. Problem - Analysis Funnel</div>
+        <div class="infographic-description">Use on: <strong>Problem That You Are Solving</strong> slide</div>
+        <div class="mermaid">
+flowchart TD
+    A["1,000+<br/>Pitch Decks<br/>Received"] --> B["~500<br/>Initial Review"]
+    B --> C["~100<br/>Detailed Review"]
+    C --> D["~10<br/>Deep Analysis"]
+    D --> E["1-2<br/>Investments"]
+    
+    style A fill:#4285F4,stroke:#1a73e8,stroke-width:4px,color:#fff
+    style B fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style D fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+    style E fill:#ea4335,stroke:#c5221f,stroke-width:4px,color:#fff
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 3: Impact - Time Comparison -->
+    <div class="infographic-section">
+        <div class="infographic-title">3. Impact - Time Savings Comparison</div>
+        <div class="infographic-description">Use on: <strong>Impact of the Solution</strong> slide</div>
+        <div class="mermaid">
+graph LR
+    subgraph Before["❌ Before VC Analyst AI"]
+        A["4-6 Hours<br/>Manual Analysis"]
+        B["1% Coverage<br/>~10 Startups/Month"]
+    end
+    
+    subgraph After["✅ After VC Analyst AI"]
+        C["2 Minutes<br/>AI Analysis"]
+        D["10x Coverage<br/>~100 Startups/Month"]
+    end
+    
+    Before -->|"95% Time Reduction"| After
+    
+    style A fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+    style B fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+    style C fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style D fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style Before fill:#fff5f5,stroke:#ea4335,stroke-width:2px
+    style After fill:#f0fdf4,stroke:#34a853,stroke-width:2px
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 4: Impact - Metrics -->
+    <div class="infographic-section">
+        <div class="infographic-title">4. Impact - Key Metrics</div>
+        <div class="infographic-description">Use on: <strong>Impact of the Solution</strong> slide</div>
+        <div class="mermaid">
+graph TB
+    subgraph Metrics["📊 Key Impact Metrics"]
+        A["⏱️ 95%<br/>Time Reduction"]
+        B["📈 10x<br/>More Startups"]
+        C["✅ 100%<br/>Structured Output"]
+        D["🎯 7 Dimensions<br/>Multi-Rating"]
+    end
+    
+    style A fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style B fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style D fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+    style Metrics fill:#f8f9fa,stroke:#4285F4,stroke-width:2px
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 5: Solution Flow -->
+    <div class="infographic-section">
+        <div class="infographic-title">5. Solution - How It Works</div>
+        <div class="infographic-description">Use on: <strong>Brief About Your Solution</strong> slide</div>
+        <div class="mermaid">
+flowchart LR
+    A["📤 Upload<br/>Documents<br/>PDF/DOCX"] --> B["🤖 AI Analysis<br/>Gemini Pro<br/>1-2 Minutes"]
+    B --> C["📊 Generate<br/>Comprehensive<br/>Brief"]
+    C --> D["✅ Investor-Ready<br/>Analysis"]
+    
+    style A fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style B fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style D fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 6: Google Technologies -->
+    <div class="infographic-section">
+        <div class="infographic-title">6. Google Technologies Stack</div>
+        <div class="infographic-description">Use on: <strong>Google Technologies Used and Their Use Cases</strong> slide</div>
+        <div class="mermaid">
+graph TB
+    subgraph Google["🔵 Google Cloud Platform"]
+        A["🧠 Vertex AI<br/>Gemini 2.5 Pro<br/>📄 Document Analysis"]
+        B["⚡ Vertex AI<br/>Gemini 2.5 Flash Lite<br/>🔍 Web Search"]
+        C["🔐 Google OAuth 2.0<br/>🔒 Authentication"]
+    end
+    
+    A --> D["📊 Structured Analysis"]
+    B --> E["📈 Market Intelligence"]
+    C --> F["👤 User Management"]
+    
+    style A fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style B fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style Google fill:#f8f9fa,stroke:#4285F4,stroke-width:3px
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 7: Features -->
+    <div class="infographic-section">
+        <div class="infographic-title">7. Features Overview</div>
+        <div class="infographic-description">Use on: <strong>Features of the Solution</strong> slide</div>
+        <div class="mermaid">
+mindmap
+  root((VC Analyst AI<br/>Features))
+    Comprehensive Analysis
+      Problem & Solution
+      Market Analysis
+      Team Evaluation
+      Risk Assessment
+    Strategic Frameworks
+      Ansoff Matrix
+      Business Model Canvas
+      Rogers Bell Curve
+    Multi-Dimensional Ratings
+      7 Rating Metrics
+      0-100 Scale
+      Source Attribution
+    Interactive Q&A
+      AI Chat
+      Context-Aware
+      Deep Dive
+    Export & History
+      PDF Export
+      Analysis History
+      Comparison
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 8: Architecture -->
+    <div class="infographic-section">
+        <div class="infographic-title">8. Architecture Flow</div>
+        <div class="infographic-description">Use on: <strong>Architecture Diagram of the Proposed Solution</strong> slide</div>
+        <div class="mermaid">
+flowchart TD
+    A["👤 User<br/>Uploads Documents"] --> B["🌐 Next.js Frontend"]
+    B --> C["☁️ Vercel Blob<br/>File Storage"]
+    C --> D["🔧 API Layer<br/>Document Parser"]
+    D --> E["🤖 Vertex AI<br/>Gemini Pro"]
+    E --> F["🔍 Gemini Flash Lite<br/>Web Search"]
+    F --> G["💾 PostgreSQL<br/>Store Results"]
+    G --> H["📊 Results Page<br/>Display Analysis"]
+    
+    style A fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style B fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style D fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+    style E fill:#4285F4,stroke:#1a73e8,stroke-width:4px,color:#fff
+    style F fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style G fill:#fbbc04,stroke:#f9ab00,stroke-width:3px,color:#000
+    style H fill:#ea4335,stroke:#c5221f,stroke-width:3px,color:#fff
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 9: Differentiation -->
+    <div class="infographic-section">
+        <div class="infographic-title">9. Differentiation Comparison</div>
+        <div class="infographic-description">Use on: <strong>How Is This Solution Different from Others</strong> slide</div>
+        <div class="mermaid">
+graph LR
+    subgraph Generic["❌ Generic AI Tools"]
+        A["Text Summaries"]
+        B["No Frameworks"]
+        C["Single Score"]
+    end
+    
+    subgraph VC["✅ VC Analyst AI"]
+        D["VC-Specific Analysis"]
+        E["Strategic Frameworks<br/>Ansoff, BMC, Rogers"]
+        F["7-Dimensional Ratings"]
+    end
+    
+    Generic -->|"Purpose-Built"| VC
+    
+    style A fill:#ea4335,stroke:#c5221f,stroke-width:2px,color:#fff
+    style B fill:#ea4335,stroke:#c5221f,stroke-width:2px,color:#fff
+    style C fill:#ea4335,stroke:#c5221f,stroke-width:2px,color:#fff
+    style D fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style E fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style F fill:#34a853,stroke:#137333,stroke-width:3px,color:#fff
+    style Generic fill:#fff5f5,stroke:#ea4335,stroke-width:2px
+    style VC fill:#f0fdf4,stroke:#34a853,stroke-width:2px
+        </div>
+    </div>
+
+    <!-- INFOGRAPHIC 10: Future Roadmap -->
+    <div class="infographic-section">
+        <div class="infographic-title">10. Future Roadmap</div>
+        <div class="infographic-description">Use on: <strong>Future Scope</strong> slide</div>
+        <div class="mermaid">
+gantt
+    title VC Analyst AI Roadmap
+    dateFormat YYYY-MM-DD
+    section Short-Term
+    API Access           :a1, 2025-11-29, 2M
+    Team Collaboration   :a2, 2025-12-10, 1M
+    Enhanced Frameworks  :a3, after a1, 2M
+    section Medium-Term
+    Custom AI Training   :b1, after a3, 2M
+    Financial Analysis   :b2, after a3, 3M
+    Competitive Mapping  :b3, after a3, 1M
+    section Long-Term
+    Industry Standard    :c1, after b3, 3M
+    Ecosystem Integration:c2, after b1, 2M
+    Predictive Analytics :c3, after c2, 4M
+        </div>
+    </div>
+
+    <!-- Load Mermaid script and initialize -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        // Wait for Mermaid to load, then initialize
+        function initMermaid() {
+            if (typeof mermaid !== 'undefined') {
+                mermaid.initialize({ 
+                    startOnLoad: true,
+                    theme: 'default',
+                    themeVariables: {
+                        primaryColor: '#4285F4',
+                        primaryTextColor: '#fff',
+                        primaryBorderColor: '#1a73e8',
+                        lineColor: '#34a853',
+                        secondaryColor: '#ea4335',
+                        tertiaryColor: '#fbbc04'
+                    },
+                    securityLevel: 'loose',
+                    flowchart: {
+                        useMaxWidth: true,
+                        htmlLabels: true
+                    }
+                });
+                
+                // Update status
+                const statusEl = document.getElementById('status');
+                if (statusEl) {
+                    statusEl.textContent = '✓ Diagrams loaded successfully!';
+                    statusEl.style.color = '#34a853';
+                }
+            } else {
+                // Retry after a short delay
+                setTimeout(initMermaid, 100);
+            }
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(initMermaid, 500);
+            });
+        } else {
+            setTimeout(initMermaid, 500);
+        }
+    </script>
+    
+    <div style="text-align: center; padding: 40px; color: #5f6368; background: white; margin: 30px 0; border-radius: 10px;">
+        <h3 style="color: #202124;">Troubleshooting</h3>
+        <p>If diagrams don't render, try:</p>
+        <ol style="text-align: left; display: inline-block; max-width: 600px;">
+            <li>Refresh the page (F5 or Cmd+R)</li>
+            <li>Check your internet connection (Mermaid loads from CDN)</li>
+            <li>Open browser console (F12) to check for errors</li>
+            <li>Try opening in a different browser (Chrome, Firefox, Edge)</li>
+            <li>Wait a few seconds for diagrams to load</li>
+        </ol>
+        <p style="margin-top: 20px;">
+            <strong>Alternative:</strong> Visit <a href="https://mermaid.live" target="_blank" style="color: #4285F4;">mermaid.live</a> 
+            and copy-paste the Mermaid code from <code>presentation-infographics.md</code>
+        </p>
+    </div>
+</body>
+</html>
