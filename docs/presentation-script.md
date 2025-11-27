@@ -1,5 +1,3 @@
-
-
 # 🎬 **1) OPENING — THE PROBLEM (Slide 2)**
 
 ### 👤 **Speaker:** **Shreyanshu**
@@ -107,12 +105,12 @@
 > “Startup Analyst-XI goes far beyond text summaries.
 > It generates investor-grade outputs using real strategic frameworks:
 >
-> * It builds a full **Business Model Canvas** for the startup.
-> * It applies the **Ansoff Matrix** to evaluate product and market positioning.
-> * It uses the **Rogers Bell Curve** to determine adoption maturity.
-> * It assigns **multi-dimensional ratings** from 0 to 100 across team strength, market quality, traction, moat, and risks.
-> * It performs structured **problem and solution analysis**, **market evaluation**, and **risk scoring**.
-> * And it includes an interactive **AI chatbot** that answers detailed questions using both the document and real-time web data.”
+> - It builds a full **Business Model Canvas** for the startup.
+> - It applies the **Ansoff Matrix** to evaluate product and market positioning.
+> - It uses the **Rogers Bell Curve** to determine adoption maturity.
+> - It assigns **multi-dimensional ratings** from 0 to 100 across team strength, market quality, traction, moat, and risks.
+> - It performs structured **problem and solution analysis**, **market evaluation**, and **risk scoring**.
+> - And it includes an interactive **AI chatbot** that answers detailed questions using both the document and real-time web data.”
 >
 > “All of this is generated automatically — in minutes — and packaged into a clean, ready-to-use investor brief.”
 
@@ -142,7 +140,7 @@
 ### 👤 **SCRIPT (Ashwin — Chatbot Demo):**
 
 > “Now let’s interact with the chatbot.
-> I’ll ask a real question: *‘What was PhysicsWallah’s profit last year?’*”
+> I’ll ask a real question: _‘What was PhysicsWallah’s profit last year?’_”
 >
 > “In a few seconds, the chatbot responds using the PDF and the web — giving the exact profit and the source context.”
 >
@@ -150,9 +148,8 @@
 
 ### 👤 **SCRIPT (Akshay):**
 
-> “On the left, we also have a **History** section that stores every analysis a user has ever done.”
-> “And here is the **Go Pro** section — a simple form that users can fill if they want to increase their limit beyond the current 25 free analyses per account.”
-> “Finally, the **Privacy** and **Terms** tabs explain how we handle data securely.”
+> “At the very bottom of every analysis you can see if there were any past analysis done for this same business. On the left, we also have a **History** section that stores every analysis a user has ever done.”
+> “And here is the **Go Pro** section — a simple form that users can fill if they want to increase their limit beyond the current 25 free analyses per account. In future we would integrate payment gateway so that users can themsleves upgrade their plans.”
 
 ⏱ **Total Duration:** ~2 minutes
 
