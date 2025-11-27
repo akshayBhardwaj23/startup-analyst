@@ -820,8 +820,8 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in">
-      <div className="max-w-screen-2xl mx-auto">
+    <div className="min-h-screen w-full px-5 py-10 sm:px-8 md:px-12 font-sans fade-in overflow-x-hidden">
+      <div className="max-w-screen-2xl mx-auto w-full max-w-full">
         <header className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight bg-gradient-to-r from-indigo-500 via-fuchsia-500 to-pink-500 text-transparent bg-clip-text">
@@ -868,9 +868,9 @@ export default function ResultsPage() {
           </button>
         </header>
 
-        <section className="panel glass brief flex flex-col min-h-[420px] relative">
-          <div className="flex items-start justify-between gap-4 mb-2">
-            <div>
+        <section className="panel glass brief flex flex-col min-h-[420px] relative w-full max-w-full overflow-x-hidden">
+          <div className="flex items-start justify-between gap-4 mb-2 w-full max-w-full min-w-0 flex-wrap sm:flex-nowrap">
+            <div className="min-w-0 flex-1">
               <div className="card-title">Output</div>
               <h2 className="text-lg font-semibold tracking-tight">
                 VC Style Summary
@@ -933,10 +933,10 @@ export default function ResultsPage() {
               )}
             </div>
             {brief && (
-              <div className="flex items-center gap-2" data-noexport="true">
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap" data-noexport="true">
                 <button
                   onClick={onDownloadPDF}
-                  className="copy-btn flex items-center gap-2"
+                  className="copy-btn flex items-center gap-2 text-xs sm:text-sm"
                   title="Download PDF"
                 >
                   <svg
@@ -954,14 +954,17 @@ export default function ResultsPage() {
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" x2="12" y1="15" y2="3" />
                   </svg>
-                  <span>Download PDF</span>
+                  <span className="hidden xs:inline">Download PDF</span>
+                  <span className="xs:hidden">PDF</span>
                 </button>
                 <button
                   onClick={() => setChatOpen(true)}
-                  className="btn-primary text-sm flex items-center gap-2"
+                  className="btn-primary text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-5 sm:py-3"
                   title="Ask the startup"
                 >
-                  💬 Ask the Startup
+                  <span className="text-sm sm:text-base">💬</span>
+                  <span className="hidden sm:inline">Ask the Startup</span>
+                  <span className="sm:hidden">Ask</span>
                 </button>
               </div>
             )}
@@ -973,9 +976,9 @@ export default function ResultsPage() {
             />
           </div>
           <div className="divider" />
-          <div className="relative flex-1">
+          <div className="relative flex-1 w-full max-w-full overflow-x-hidden">
             {brief && (
-              <div className="space-y-6">
+              <div className="space-y-6 w-full max-w-full">
                 {brief.raw ? (
                   <pre className="brief-pre">{brief.raw}</pre>
                 ) : (
@@ -1162,7 +1165,7 @@ export default function ResultsPage() {
                       </div>
                     )}
                     {/* Problem & Solution at the top (just below ratings) */}
-                    <div className="grid gap-5 md:gap-6">
+                    <div className="grid gap-5 md:gap-6 w-full max-w-full overflow-x-hidden">
                       {(["problem", "solution"] as const).map((key) => {
                         const label = key === "problem" ? "Problem" : "Solution";
                         const val: any = (brief as any)[key];
@@ -1206,7 +1209,7 @@ export default function ResultsPage() {
                         return (
                           <div
                             key={key}
-                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5"
+                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2 sm:p-3 border border-white/5 w-full max-w-full min-w-0"
                           >
                             <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
@@ -1218,9 +1221,9 @@ export default function ResultsPage() {
                       })}
                     </div>
                     {/* Strategic Analysis Components */}
-                    <div className="grid gap-5 md:gap-6">
+                    <div className="grid gap-5 md:gap-6 w-full max-w-full overflow-x-hidden">
                       {brief.business_model_canvas?.value_propositions && (
-                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
+                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2 sm:p-3 border border-white/5 w-full max-w-full min-w-0">
                           <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Business Model Canvas
@@ -1231,7 +1234,7 @@ export default function ResultsPage() {
                         </div>
                       )}
                       {brief.ansoff_matrix?.quadrant && (
-                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
+                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2 sm:p-3 border border-white/5 w-full max-w-full min-w-0">
                           <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Ansoff Matrix
@@ -1240,7 +1243,7 @@ export default function ResultsPage() {
                         </div>
                       )}
                       {brief.rogers_bell_curve?.category && (
-                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5">
+                        <div className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2 sm:p-3 border border-white/5 w-full max-w-full min-w-0">
                           <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                             <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
                             Rogers Bell Curve (Adoption)
@@ -1249,7 +1252,7 @@ export default function ResultsPage() {
                         </div>
                       )}
                     </div>
-                    <div className="grid gap-5 md:gap-6 text-sm md:text-base leading-relaxed">
+                    <div className="grid gap-5 md:gap-6 text-sm md:text-base leading-relaxed w-full max-w-full overflow-x-hidden">
                       {[
                         {
                           key: "icp_gtm",
@@ -1324,7 +1327,7 @@ export default function ResultsPage() {
                                   return (
                                     <div
                                       key={sub}
-                                      className="rounded-md bg-white/[0.02] p-2.5 border border-white/[0.04]"
+                                      className="rounded-md bg-white/[0.02] p-2 sm:p-2.5 border border-white/[0.04] w-full max-w-full min-w-0"
                                     >
                                       <div className="text-base uppercase tracking-wider font-semibold text-indigo-300/60 mb-1.5">
                                         {prettyLabel}
@@ -1355,7 +1358,7 @@ export default function ResultsPage() {
                                   {items.map((h: any, i: number) => (
                                     <li
                                       key={i}
-                                      className="rounded-md border border-amber-400/20 bg-amber-400/5 p-3"
+                                      className="rounded-md border border-amber-400/20 bg-amber-400/5 p-2 sm:p-3 w-full max-w-full min-w-0"
                                     >
                                       {h.claim && (
                                         <div className="font-medium text-sm md:text-base leading-snug mb-1.5 text-amber-200/90">
@@ -1432,7 +1435,7 @@ export default function ResultsPage() {
                                     return (
                                       <li
                                         key={i}
-                                        className={`rounded-md border ${config.border} ${config.bg} p-3 flex items-start gap-2.5`}
+                                        className={`rounded-md border ${config.border} ${config.bg} p-2 sm:p-3 flex items-start gap-2 sm:gap-2.5 w-full max-w-full min-w-0`}
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
@@ -1460,9 +1463,9 @@ export default function ResultsPage() {
                                             y2="17"
                                           />
                                         </svg>
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                           <div
-                                            className={`font-medium text-sm md:text-base leading-snug ${config.text}`}
+                                            className={`font-medium text-sm md:text-base leading-snug ${config.text} break-words`}
                                           >
                                             {riskText}
                                           </div>
@@ -1483,13 +1486,13 @@ export default function ResultsPage() {
                             // Founders: display founder cards with contact info
                             if (section.key === "founders") {
                               return (
-                                <div className="grid gap-3">
+                                <div className="grid gap-3 w-full max-w-full overflow-x-hidden">
                                   {items.map((founder: any, i: number) => (
                                     <div
                                       key={i}
-                                      className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-4"
+                                      className="rounded-lg border border-indigo-500/20 bg-indigo-500/5 p-3 sm:p-4 w-full max-w-full min-w-0"
                                     >
-                                      <div className="flex items-start gap-3">
+                                      <div className="flex items-start gap-2 sm:gap-3 w-full min-w-0">
                                         <div className="flex-shrink-0 w-12 h-12 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center">
                                           <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -1507,9 +1510,9 @@ export default function ResultsPage() {
                                             <circle cx="12" cy="7" r="4" />
                                           </svg>
                                         </div>
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                           {founder.name && (
-                                            <div className="font-semibold text-base text-indigo-100 mb-0.5">
+                                            <div className="font-semibold text-sm sm:text-base text-indigo-100 mb-0.5 break-words">
                                               {founder.name}
                                             </div>
                                           )}
@@ -1614,8 +1617,8 @@ export default function ResultsPage() {
                               val.location;
                             if (!hasAnyContact) return null;
                             return (
-                              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
-                                <div className="grid gap-3 sm:grid-cols-2">
+                              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 sm:p-4 w-full max-w-full min-w-0">
+                                <div className="grid gap-3 sm:grid-cols-2 w-full max-w-full overflow-x-hidden">
                                   {val.email && (
                                     <div className="flex items-start gap-2">
                                       <svg
@@ -1639,7 +1642,7 @@ export default function ResultsPage() {
                                         />
                                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                                       </svg>
-                                      <div>
+                                      <div className="flex-1 min-w-0">
                                         <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
                                           Email
                                         </div>
@@ -1653,7 +1656,7 @@ export default function ResultsPage() {
                                     </div>
                                   )}
                                   {val.phone && (
-                                    <div className="flex items-start gap-2">
+                                    <div className="flex items-start gap-2 w-full min-w-0">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="16"
@@ -1668,13 +1671,13 @@ export default function ResultsPage() {
                                       >
                                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                                       </svg>
-                                      <div>
+                                      <div className="flex-1 min-w-0">
                                         <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
                                           Phone
                                         </div>
                                         <a
                                           href={`tel:${val.phone}`}
-                                          className="text-sm text-emerald-200 hover:underline"
+                                          className="text-sm text-emerald-200 hover:underline break-all"
                                         >
                                           {val.phone}
                                         </a>
@@ -1682,7 +1685,7 @@ export default function ResultsPage() {
                                     </div>
                                   )}
                                   {val.website && (
-                                    <div className="flex items-start gap-2">
+                                    <div className="flex items-start gap-2 w-full min-w-0">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="16"
@@ -1699,7 +1702,7 @@ export default function ResultsPage() {
                                         <line x1="2" x2="22" y1="12" y2="12" />
                                         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                                       </svg>
-                                      <div>
+                                      <div className="flex-1 min-w-0">
                                         <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
                                           Website
                                         </div>
@@ -1715,7 +1718,7 @@ export default function ResultsPage() {
                                     </div>
                                   )}
                                   {val.location && (
-                                    <div className="flex items-start gap-2">
+                                    <div className="flex items-start gap-2 w-full min-w-0">
                                       <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="16"
@@ -1731,11 +1734,11 @@ export default function ResultsPage() {
                                         <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                                         <circle cx="12" cy="10" r="3" />
                                       </svg>
-                                      <div>
+                                      <div className="flex-1 min-w-0">
                                         <div className="text-xs text-emerald-300/70 uppercase tracking-wider mb-0.5">
                                           Location
                                         </div>
-                                        <div className="text-sm text-emerald-200">
+                                        <div className="text-sm text-emerald-200 break-words">
                                           {val.location}
                                         </div>
                                       </div>
@@ -1764,7 +1767,7 @@ export default function ResultsPage() {
                         return (
                           <div
                             key={section.key}
-                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-3 border border-white/5"
+                            className="group rounded-md bg-white/1.5 hover:bg-white/[0.03] transition-colors p-2 sm:p-3 border border-white/5 w-full max-w-full min-w-0"
                           >
                             <div className="text-base uppercase font-semibold tracking-wider text-indigo-300/70 mb-2 flex items-center gap-1">
                               <span className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-pink-400" />
