@@ -38,12 +38,12 @@ export default function BusinessModelCanvas({
     className?: string;
   }) => (
     <div
-      className={`p-3 sm:p-4 rounded-lg border-2 ${color} ${className}`}
+      className={`p-2 sm:p-3 md:p-4 rounded-lg border-2 ${color} ${className} w-full max-w-full min-w-0`}
     >
-      <div className="text-xs sm:text-sm font-semibold text-[color:var(--foreground)] mb-1.5 uppercase tracking-wide">
+      <div className="text-xs sm:text-sm font-semibold text-[color:var(--foreground)] mb-1.5 uppercase tracking-wide break-words">
         {title}
       </div>
-      <div className="text-xs sm:text-sm text-[color:var(--foreground)] opacity-90 leading-relaxed">
+      <div className="text-xs sm:text-sm text-[color:var(--foreground)] opacity-90 leading-relaxed break-words">
         {content.text || "Not specified"}
       </div>
     </div>
@@ -62,8 +62,8 @@ export default function BusinessModelCanvas({
   ].filter((ref, index, self) => ref && self.indexOf(ref) === index);
 
   return (
-    <div className="space-y-2">
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-10">
+    <div className="space-y-2 w-full max-w-full overflow-x-hidden">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-10 w-full max-w-full">
       {/* Key Partners */}
       <div className="lg:col-span-2 lg:row-span-2">
         <Block

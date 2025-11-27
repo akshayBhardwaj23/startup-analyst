@@ -63,17 +63,17 @@ export default function RogersBellCurve({ data }: RogersBellCurveProps) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-full overflow-x-hidden">
       {/* Bell Curve Visualization */}
-      <div className="relative">
-        <div className="flex items-end justify-center gap-1 w-full max-w-2xl mx-auto">
+      <div className="relative w-full max-w-full overflow-x-auto">
+        <div className="flex items-end justify-center gap-1 w-full max-w-2xl mx-auto min-w-0">
           {categories.map((cat, idx) => {
             const heights = ["h-12", "h-24", "h-32", "h-24", "h-12"];
             const isActive = cat.key === category;
             return (
               <div
                 key={cat.key}
-                className={`flex-1 rounded-t-lg border-2 transition-all duration-300 ${
+                className={`flex-1 min-w-0 rounded-t-lg border-2 transition-all duration-300 ${
                   heights[idx]
                 } ${
                   isActive
@@ -108,11 +108,11 @@ export default function RogersBellCurve({ data }: RogersBellCurveProps) {
         </div>
 
         {/* Category Descriptions */}
-        <div className="mt-4 grid grid-cols-5 gap-1 text-center max-w-2xl mx-auto">
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-1 sm:gap-1 text-center max-w-2xl mx-auto w-full overflow-x-hidden">
           {categories.map((cat) => (
             <div
               key={cat.key}
-              className={`text-[9px] opacity-70 ${
+              className={`text-[9px] opacity-70 break-words ${
                 cat.key === category ? "font-semibold opacity-100" : ""
               }`}
             >
@@ -123,11 +123,11 @@ export default function RogersBellCurve({ data }: RogersBellCurveProps) {
       </div>
 
       {/* Rationale */}
-      <div>
+      <div className="w-full max-w-full min-w-0">
         <h4 className="text-sm font-semibold text-[color:var(--foreground)] mb-2">
           Target Adopter Analysis
         </h4>
-        <div className="text-sm text-[color:var(--foreground)] bg-white/[0.02] border border-white/5 rounded-lg p-3">
+        <div className="text-sm text-[color:var(--foreground)] bg-white/[0.02] border border-white/5 rounded-lg p-2 sm:p-3 w-full max-w-full min-w-0 break-words">
           {rationale.text}
           {rationale.refs && rationale.refs.length > 0 && (
             <div className="mt-2 text-xs opacity-60">
