@@ -1,3 +1,6 @@
+<img width="1600" height="1200" alt="Google Hackathon Certificate" src="https://github.com/user-attachments/assets/4e1aed8c-3ba1-4c88-a195-2d8a62531d00" />
+
+
 VC Analyst – Upload & Analyze (Gemini)
 
 This app lets you upload PDF/DOCX files and generates a structured VC-style brief using Google Vertex AI (Gemini). It runs fully server-side, with client-side uploads to Vercel Blob to avoid request-size limits.
